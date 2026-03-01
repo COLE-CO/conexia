@@ -5,5 +5,5 @@ pydantic
 pydantic[email]
 pydantic-settings
 python-jose[cryptography]
-bycript
+bcrypt
 python-multipart
