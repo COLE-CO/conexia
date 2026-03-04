@@ -1,19 +1,21 @@
-from pydantic_settings import BaseSettings
+from pathlib import Path
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+ENV_FILE = Path(__file__).resolve().parent.parent.parent / ".env"
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Conexia"
-    
-    DATABASE_URL: str = "sqlite:///./sql_app.db"
+    model_config = SettingsConfigDict(env_file=ENV_FILE, env_file_encoding="utf-8")
 
-    SECRET_KEY: str = "9dae5c48441468dd716672358411ef2ba77c602c35ee9a4eb9338777128cd75b"
+    PROJECT_NAME: str = "Conexia"
+
+    DATABASE_URL: str
+
+    SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # Seed admin
-    ADMIN_EMAIL: str = "admin@conexia.com"
-    ADMIN_PASSWORD: str = "ConexiaAdmin2026*"
-
-    class Config:
-        env_file = ".env"
+    ADMIN_EMAIL: str
+    ADMIN_PASSWORD: str
 
 settings = Settings()

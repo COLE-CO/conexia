@@ -3,8 +3,6 @@ from src.core.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 from src.modules.auth.router import router as auth_router
 
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI(title="Conexia API")
 
 origins = [
