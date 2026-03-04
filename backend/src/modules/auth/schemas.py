@@ -22,6 +22,10 @@ class UserCreate(UserBase):
 class UserResponse(UserBase):
     id: int
     is_active: bool
-
+    must_change_password: bool
+    
     class Config:
         from_attributes = True 
+
+class PasswordChangeRequest(BaseModel):
+    new_password: str
