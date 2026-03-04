@@ -32,13 +32,20 @@ def get_current_active_user(current_user: models.User = Depends(get_current_user
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
-# Factory para requerir roles específicos
+def get_current_user_ready(current_user: models.User = Depends(get_current_active_user)):
+    if current_user.must_change_password:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You must change your temporary password before using the system."
+        )
+    return current_user
+
 def require_role(allowed_roles: list[models.UserRole]):
-    def role_checker(current_user: models.User = Depends(get_current_active_user)):
+    def role_checker(current_user: models.User = Depends(get_current_user_ready)):
         if current_user.role not in allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Operation not permitted"
+                detail="You do not have permission to perform this action"
             )
         return current_user
     return role_checker

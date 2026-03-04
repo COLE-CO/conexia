@@ -16,3 +16,4 @@ class User(Base):
     full_name = Column(String, nullable=True)
     role = Column(SqlEnum(UserRole), default=UserRole.CONTADOR_COLE_CO, nullable=False)
     is_active = Column(Boolean, default=True)
+    must_change_password = Column(Boolean, default=True)
