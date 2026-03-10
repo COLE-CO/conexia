@@ -19,7 +19,10 @@ load_dotenv()
 from src.core.config import settings
 from src.core.database import Base
 
-from src.modules.auth import models 
+# IMPORTAR TODOS LOS MODELOS
+
+from src.modules.auth import models
+from src.modules.family_office.companies import models as company_models
 # =================================================================
 
 
