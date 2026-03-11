@@ -11,8 +11,10 @@ class CompanyCreate(CompanyBase):
     pass
 
 
-class CompanyUpdate(CompanyBase):
-    pass
+class CompanyUpdate(BaseModel):
+    name: str | None = None
+    nit: str | None = None
+    logo_url: str | None = None
 
 
 class CompanyResponse(CompanyBase):
