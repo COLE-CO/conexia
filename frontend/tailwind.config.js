@@ -7,22 +7,22 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Colores corporativos Conexia
         primary: {
-          DEFAULT: '#14145E', // Azul principal
-          hover: '#080d3b',
+          DEFAULT: '#0A1628', // Navy oscuro - sidebar
+          hover: '#0d1f3c',   // Navy hover
         },
         secondary: {
-          DEFAULT: '#C99749', // Crema secundario
+          DEFAULT: '#0966C3', // Azul vibrante - acento/botones
         },
         neutral: {
-          bg: '#F8FAFC',      // Fondo gris muy claro para legibilidad
-          surface: '#FFFFFF', // Tarjetas blancas
-          text: '#334155',    // Texto oscuro
-          border: '#E2E8F0',
+          bg: '#F0F4F8',      // Fondo general
+          surface: '#FFFFFF', // Tarjetas
+          text: '#0A1628',    // Texto principal
+          border: '#e2e8f0',  // Bordes
+          muted: '#647477',   // Texto secundario
         },
         danger: {
-          DEFAULT: '#EF4444', // Rojo para errores
+          DEFAULT: '#EF4444',
         }
       },
       fontFamily: {
