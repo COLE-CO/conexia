@@ -61,6 +61,11 @@ function App() {
             <LayoutWithSidebar><h1 className="p-6">Ajustes</h1></LayoutWithSidebar>
           </ProtectedRoute>
         } />
+        <Route path="/notificaciones" element={
+          <ProtectedRoute>
+            <LayoutWithSidebar><h1 className="p-6">Notificaciones</h1></LayoutWithSidebar>
+          </ProtectedRoute>
+        } />
       </Routes>
     </BrowserRouter>
   );
