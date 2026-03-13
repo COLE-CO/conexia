@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCompany } from '../context/CompanyContext';
 import CompanySelector from '../components/CompanySelector';
+import { getBalancesByCompany, deleteBalance } from '../services/balanceService';
+import type { Balance } from '../services/balanceService';
+import UploadBalanceModal from '../components/UploadBalanceModal';
 import {
   TrendingUp,
   TrendingDown,
@@ -15,14 +18,6 @@ import {
   Triangle,
 } from 'lucide-react';
 
-interface Balance {
-  id: number;
-  name: string;
-  company: string;
-  type: string;
-  date: string;
-}
-
 const metrics = [
   { label: 'Ingresos totales', value: '$ 0', icon: TrendingUp, color: 'bg-primary text-white' },
   { label: 'Gastos totales', value: '$ 0', icon: TrendingDown, color: 'bg-red-50 text-red-400' },
@@ -35,7 +30,24 @@ type Tab = 'balances' | 'vencimientos' | 'cartera';
 export default function FamilyOfficePage() {
   const { activeCompany } = useCompany();
   const [activeTab, setActiveTab] = useState<Tab>('balances');
-  const [balances] = useState<Balance[]>([]);
+  const [balances, setBalances] = useState<Balance[]>([]);
+  const [loadingBalances, setLoadingBalances] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+
+  useEffect(() => {
+    if (!activeCompany) return;
+    setLoadingBalances(true);
+    getBalancesByCompany(activeCompany.id)
+      .then(setBalances)
+      .catch(() => setBalances([]))
+      .finally(() => setLoadingBalances(false));
+  }, [activeCompany]);
+
+  const handleDelete = async (balanceId: number) => {
+    if (!confirm('¿Seguro que deseas eliminar este balance?')) return;
+    await deleteBalance(balanceId);
+    setBalances(prev => prev.filter(b => b.id !== balanceId));
+  };
 
   return (
     <div className="p-8 min-h-screen bg-neutral-bg">
@@ -53,7 +65,10 @@ export default function FamilyOfficePage() {
             <Sparkles size={16} />
             Generar reporte IA
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm hover:bg-primary-hover transition-colors duration-200">
+          <button
+            onClick={() => setShowUploadModal(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm hover:bg-primary-hover transition-colors duration-200"
+          >
             <Upload size={16} />
             Subir balance
           </button>
@@ -105,7 +120,11 @@ export default function FamilyOfficePage() {
 
       {/* Contenido tabs */}
       {activeTab === 'balances' && (
-        balances.length === 0 ? (
+        loadingBalances ? (
+          <div className="text-center py-12 text-neutral-muted text-sm animate-pulse">
+            Cargando balances...
+          </div>
+        ) : balances.length === 0 ? (
           <div className="bg-neutral-surface border border-neutral-border rounded-xl p-8 text-center">
             <FileSpreadsheet size={32} className="text-neutral-muted mx-auto mb-3" />
             <p className="text-sm font-medium text-neutral-text mb-1">No hay balances cargados</p>
@@ -125,24 +144,34 @@ export default function FamilyOfficePage() {
                       <FileSpreadsheet size={18} className="text-neutral-muted" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-neutral-text">{balance.name}</p>
+                      <p className="text-sm font-semibold text-neutral-text">{balance.file_name}</p>
                       <p className="text-xs text-neutral-muted">
-                        {balance.company} · {balance.type} · Subido {balance.date}
+                        {activeCompany?.name} · {balance.year}
+                        {balance.month ? `/${balance.month}` : ''} · Subido {String(balance.uploaded_at).slice(0, 10)}
                       </p>
                     </div>
                   </div>
-                  <span className="text-xs font-medium px-2 py-1 rounded-full bg-neutral-bg border border-neutral-border text-neutral-text">
-                    {balance.type}
-                  </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-border text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200">
+                  <a
+                    href={balance.file_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-border text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200"
+                  >
                     <Eye size={14} /> Ver datos
-                  </button>
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-border text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200">
+                  </a>
+                  <a
+                    href={balance.file_url}
+                    download
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-border text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200"
+                  >
                     <Download size={14} /> Exportar
-                  </button>
-                  <button className="p-1.5 rounded-lg border border-neutral-border text-red-400 hover:bg-red-50 transition-colors duration-200">
+                  </a>
+                  <button
+                    onClick={() => handleDelete(balance.id)}
+                    className="p-1.5 rounded-lg border border-neutral-border text-red-400 hover:bg-red-50 transition-colors duration-200"
+                  >
                     <Trash2 size={14} />
                   </button>
                 </div>
@@ -162,6 +191,17 @@ export default function FamilyOfficePage() {
         <div className="bg-neutral-surface border border-neutral-border rounded-xl p-6 text-center text-neutral-muted text-sm">
           Módulo de cartera próximamente.
         </div>
+      )}
+
+      {/* Modal subir balance */}
+      {showUploadModal && (
+        <UploadBalanceModal
+          onClose={() => setShowUploadModal(false)}
+          onSuccess={(newBalance: Balance) => {
+            setBalances(prev => [newBalance, ...prev]);
+            setShowUploadModal(false);
+          }}
+        />
       )}
 
     </div>

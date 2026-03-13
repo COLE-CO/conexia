@@ -16,16 +16,16 @@ import {
 } from 'lucide-react';
 
 const mainItems = [
-  { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-  { label: 'Family Office', icon: Briefcase, path: '/family-office' },
-  { label: 'Flujo de Caja', icon: ArrowLeftRight, path: '/flujo-de-caja' },
-  { label: 'Facturas', icon: FileText, path: '/facturas' },
-  { label: 'Reportes', icon: BarChart2, path: '/reportes' },
+  { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', roles: ['admin', 'contador_family_office', 'contador_cole_co'] },
+  { label: 'Family Office', icon: Briefcase, path: '/family-office', roles: ['admin', 'contador_family_office'] },
+  { label: 'Flujo de Caja', icon: ArrowLeftRight, path: '/flujo-de-caja', roles: ['admin', 'contador_family_office', 'contador_cole_co'] },
+  { label: 'Facturas', icon: FileText, path: '/facturas', roles: ['admin', 'contador_family_office', 'contador_cole_co'] },
+  { label: 'Reportes', icon: BarChart2, path: '/reportes', roles: ['admin', 'contador_family_office', 'contador_cole_co'] },
 ];
 
 export default function Sidebar() {
   const { isExpanded, toggle } = useSidebar();
-  const { logout } = useContext(AuthContext);
+  const { logout, user } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -44,11 +44,8 @@ export default function Sidebar() {
         <div className="flex items-center px-4 py-5">
           {isExpanded ? (
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-3">
-                <img src="/src/assets/logo-conexia.svg" alt="Conexia" className="w-7 h-7" />
-                <span className="text-white font-bold text-lg">Conexia</span>
-              </div>
-              
+              <img src="/src/assets/logo-conexia.svg" alt="Conexia" className="w-7 h-7" />
+              <span className="text-white font-bold text-lg">Conexia</span>
             </div>
           ) : (
             <div className="mx-auto">
@@ -59,24 +56,26 @@ export default function Sidebar() {
 
         {/* Nav principal */}
         <nav className="flex-1 px-2">
-          {mainItems.map(({ label, icon: Icon, path }) => (
-            <NavLink
-              key={path}
-              to={path}
-              className={({ isActive }) => `
-                flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 no-underline transition-colors duration-200
-                ${!isExpanded ? 'justify-center' : ''}
-                ${isActive
-                  ? 'bg-primary-hover text-white'
-                  : 'text-neutral-border hover:bg-primary-hover hover:text-white'}
-              `}
-            >
-              <Icon size={20} className="flex-shrink-0" />
-              {isExpanded && (
-                <span className="text-sm whitespace-nowrap">{label}</span>
-              )}
-            </NavLink>
-          ))}
+          {mainItems
+            .filter(item => user?.role && item.roles.includes(user.role))
+            .map(({ label, icon: Icon, path }) => (
+              <NavLink
+                key={path}
+                to={path}
+                className={({ isActive }) => `
+                  flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 no-underline transition-colors duration-200
+                  ${!isExpanded ? 'justify-center' : ''}
+                  ${isActive
+                    ? 'bg-primary-hover text-white'
+                    : 'text-neutral-border hover:bg-primary-hover hover:text-white'}
+                `}
+              >
+                <Icon size={20} className="flex-shrink-0" />
+                {isExpanded && (
+                  <span className="text-sm whitespace-nowrap">{label}</span>
+                )}
+              </NavLink>
+            ))}
         </nav>
 
         {/* Sección inferior */}
