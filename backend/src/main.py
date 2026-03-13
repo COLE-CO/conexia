@@ -3,6 +3,7 @@ from src.core.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 from src.modules.auth.router import router as auth_router
 from src.modules.family_office.companies.router import router as companies_router
+from src.modules.family_office.balances.router import router as balances_router
 
 app = FastAPI(title="Conexia API")
 
@@ -21,6 +22,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(companies_router)
+app.include_router(balances_router)
 
 @app.get("/")
 def root():
