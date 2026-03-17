@@ -5,6 +5,8 @@ import ChangePasswordPage from './pages/ChangePasswordPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { SidebarProvider } from './context/SidebarContext';
 import Sidebar from './components/Sidebar';
+import CompanyGuard from './components/CompanyGuard';
+import FamilyOfficePage from './pages/FamilyOfficePage';
 import React from 'react';
 
 function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
@@ -38,7 +40,11 @@ function App() {
         } />
         <Route path="/family-office" element={
           <ProtectedRoute>
-            <LayoutWithSidebar><h1 className="p-6">Family Office</h1></LayoutWithSidebar>
+            <LayoutWithSidebar>
+              <CompanyGuard>
+                <FamilyOfficePage />
+              </CompanyGuard>
+            </LayoutWithSidebar>
           </ProtectedRoute>
         } />
         <Route path="/flujo-de-caja" element={
