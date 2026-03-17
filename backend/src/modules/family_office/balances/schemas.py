@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 
 class BalanceResponse(BaseModel):
@@ -10,6 +11,11 @@ class BalanceResponse(BaseModel):
     file_size: int
     year: int
     month: int | None = None
+    uploaded_at: datetime
 
     class Config:
         from_attributes = True
+
+
+class BalanceDownloadResponse(BaseModel):
+    download_url: str
