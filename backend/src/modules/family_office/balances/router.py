@@ -33,6 +33,10 @@ def upload_balance(
 @router.get("/company/{company_id}", response_model=list[schemas.BalanceResponse])
 def get_balances_by_company(
     company_id: int,
+    year: int | None = None,
+    month: int | None = None,
+    day: int | None = None,
+    search: str | None = None,
     db: Session = Depends(get_db),
     current_user = Depends(
         auth_dependencies.require_role(
@@ -40,7 +44,14 @@ def get_balances_by_company(
         )
     )
 ):
-    return service.get_balances_by_company(db, company_id)
+    return service.get_balances_by_company(
+        db=db,
+        company_id=company_id,
+        year=year,
+        month=month,
+        day=day,
+        search=search
+    )
 
 
 @router.get("/{balance_id}", response_model=schemas.BalanceResponse)
@@ -77,3 +88,16 @@ def delete_balance(
         raise HTTPException(status_code=404, detail="Balance no encontrado")
 
     return {"message": "Balance eliminado correctamente"}
+
+
+@router.get("/{balance_id}/download", response_model=schemas.BalanceDownloadResponse)
+def download_balance(
+    balance_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(
+        auth_dependencies.require_role(
+            [auth_models.UserRole.ADMIN, auth_models.UserRole.CONTADOR_FAMILY_OFFICE]
+        )
+    )
+):
+    return service.get_balance_download_url(db, balance_id)

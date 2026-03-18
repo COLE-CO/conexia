@@ -1,10 +1,10 @@
 import os
 from fastapi import HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
-
+from sqlalchemy import extract
 from src.modules.family_office.companies import service as company_service
 from . import models
-from .storage import generate_storage_key, upload_file_to_s3, delete_file_from_s3
+from .storage import generate_storage_key, upload_file_to_s3, delete_file_from_s3, generate_presigned_download_url
 
 ALLOWED_EXTENSIONS = {".pdf", ".xlsx", ".xls"}
 MAX_FILE_SIZE = 15 * 1024 * 1024  # 15 MB
@@ -75,13 +75,29 @@ def upload_balance(
     return db_balance
 
 
-def get_balances_by_company(db: Session, company_id: int):
-    return (
-        db.query(models.Balance)
-        .filter(models.Balance.company_id == company_id)
-        .order_by(models.Balance.uploaded_at.desc())
-        .all()
-    )
+def get_balances_by_company(
+    db: Session,
+    company_id: int,
+    year: int | None = None,
+    month: int | None = None,
+    day: int | None = None,
+    search: str | None = None
+):
+    query = db.query(models.Balance).filter(models.Balance.company_id == company_id)
+
+    if year is not None:
+        query = query.filter(models.Balance.year == year)
+
+    if month is not None:
+        query = query.filter(models.Balance.month == month)
+
+    if day is not None:
+        query = query.filter(extract("day", models.Balance.uploaded_at) == day)
+
+    if search:
+        query = query.filter(models.Balance.original_filename.ilike(f"%{search}%"))
+
+    return query.order_by(models.Balance.uploaded_at.desc()).all()
 
 
 def get_balance(db: Session, balance_id: int):
@@ -102,3 +118,22 @@ def delete_balance(db: Session, balance_id: int):
     db.commit()
 
     return balance
+
+
+def get_balance_download_url(db: Session, balance_id: int):
+    balance = get_balance(db, balance_id)
+
+    if not balance:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Balance no encontrado"
+        )
+
+    download_url = generate_presigned_download_url(
+        storage_key=balance.storage_key,
+        original_filename=balance.original_filename
+    )
+
+    return {
+        "download_url": download_url
+    }
