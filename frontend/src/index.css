@@ -18,3 +18,36 @@
     font-family: theme('fontFamily.hubot');
   }
 }
+
+@layer utilities {
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 240ms ease-out both;
+  }
+
+  .animation-delay-80 {
+    animation-delay: 80ms;
+  }
+
+  .animation-delay-120 {
+    animation-delay: 120ms;
+  }
+
+  .animation-delay-160 {
+    animation-delay: 160ms;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+}

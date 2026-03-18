@@ -27,6 +27,7 @@ export default function Sidebar() {
   const { isExpanded, toggle } = useSidebar();
   const { logout, user } = useContext(AuthContext);
   const navigate = useNavigate();
+  const roleLabel = user?.role?.replaceAll('_', ' ');
 
   const handleLogout = () => {
     logout();
@@ -37,19 +38,27 @@ export default function Sidebar() {
     <div className="relative flex-shrink-0">
       <aside className={`
         ${isExpanded ? 'w-64' : 'w-[70px]'}
-        min-h-screen bg-primary flex flex-col transition-all duration-300
+        min-h-screen bg-primary flex flex-col transition-all duration-300 border-r border-primary-hover/60 shadow-2xl
       `}>
 
         {/* Header */}
         <div className="flex items-center px-4 py-5">
           {isExpanded ? (
-            <div className="flex items-center gap-3">
-              <img src="/src/assets/logo-conexia.svg" alt="Conexia" className="w-7 h-7" />
-              <span className="text-white font-bold text-lg">Conexia</span>
+            <div className="w-full">
+              <div className="flex items-center gap-3">
+                <img src="/logo-conexia.svg" alt="Conexia" className="w-7 h-7" />
+                <span className="text-white font-bold text-lg tracking-tight">Conexia</span>
+              </div>
+              {roleLabel && (
+                <div className="mt-2.5 flex items-center gap-1.5 text-[11px] tracking-wide text-neutral-border/90">
+                  <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
+                  <span className="font-medium truncate">{roleLabel}</span>
+                </div>
+              )}
             </div>
           ) : (
             <div className="mx-auto">
-              <img src="/src/assets/logo-conexia.svg" alt="Conexia" className="w-7 h-7" />
+              <img src="/logo-conexia.svg" alt="Conexia" className="w-7 h-7" />
             </div>
           )}
         </div>
@@ -63,11 +72,11 @@ export default function Sidebar() {
                 key={path}
                 to={path}
                 className={({ isActive }) => `
-                  flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 no-underline transition-colors duration-200
+                  flex items-center gap-3 pl-2.5 pr-3 py-2.5 rounded-lg mb-1 no-underline transition-all duration-200 border-l-2
                   ${!isExpanded ? 'justify-center' : ''}
                   ${isActive
-                    ? 'bg-primary-hover text-white'
-                    : 'text-neutral-border hover:bg-primary-hover hover:text-white'}
+                    ? 'border-secondary bg-primary-hover text-white shadow-lg shadow-black/20'
+                    : 'border-transparent text-neutral-border hover:bg-primary-hover hover:text-white hover:translate-x-[1px]'}
                 `}
               >
                 <Icon size={20} className="flex-shrink-0" />
@@ -80,16 +89,15 @@ export default function Sidebar() {
 
         {/* Sección inferior */}
         <div className="px-2 pb-2 flex flex-col gap-1">
-
           {/* Notificaciones */}
           <NavLink
             to="/notificaciones"
             className={({ isActive }) => `
-              flex items-center gap-3 px-3 py-2.5 rounded-lg no-underline transition-colors duration-200
+              flex items-center gap-3 pl-2.5 pr-3 py-2.5 rounded-lg no-underline transition-all duration-200 border-l-2
               ${!isExpanded ? 'justify-center' : ''}
               ${isActive
-                ? 'bg-primary-hover text-white'
-                : 'text-neutral-border hover:bg-primary-hover hover:text-white'}
+                ? 'border-secondary bg-primary-hover text-white shadow-lg shadow-black/20'
+                : 'border-transparent text-neutral-border hover:bg-primary-hover hover:text-white hover:translate-x-[1px]'}
             `}
           >
             <Bell size={20} className="flex-shrink-0" />
@@ -100,11 +108,11 @@ export default function Sidebar() {
           <NavLink
             to="/ajustes"
             className={({ isActive }) => `
-              flex items-center gap-3 px-3 py-2.5 rounded-lg no-underline transition-colors duration-200
+              flex items-center gap-3 pl-2.5 pr-3 py-2.5 rounded-lg no-underline transition-all duration-200 border-l-2
               ${!isExpanded ? 'justify-center' : ''}
               ${isActive
-                ? 'bg-primary-hover text-white'
-                : 'text-neutral-border hover:bg-primary-hover hover:text-white'}
+                ? 'border-secondary bg-primary-hover text-white shadow-lg shadow-black/20'
+                : 'border-transparent text-neutral-border hover:bg-primary-hover hover:text-white hover:translate-x-[1px]'}
             `}
           >
             <Settings size={20} className="flex-shrink-0" />
@@ -115,7 +123,7 @@ export default function Sidebar() {
           <button
             onClick={handleLogout}
             className={`
-              flex items-center gap-3 text-neutral-border bg-transparent border-none cursor-pointer px-3 py-2.5 rounded-lg w-full hover:bg-primary-hover hover:text-white transition-colors duration-200
+              flex items-center gap-3 text-neutral-border bg-transparent border-none cursor-pointer px-3 py-2.5 rounded-lg w-full hover:bg-primary-hover hover:text-white transition-all duration-200 hover:translate-x-[1px]
               ${!isExpanded ? 'justify-center' : ''}
             `}
           >

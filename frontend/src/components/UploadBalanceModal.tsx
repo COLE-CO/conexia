@@ -80,7 +80,7 @@ export default function UploadBalanceModal({ onClose, onSuccess }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-neutral-surface border border-neutral-border rounded-xl shadow-xl w-full max-w-md p-6">
+      <div className="bg-neutral-surface border border-neutral-border rounded-2xl shadow-2xl w-full max-w-md p-6 animate-fade-in-up">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
@@ -96,7 +96,7 @@ export default function UploadBalanceModal({ onClose, onSuccess }: Props) {
         {/* Empresa */}
         <div className="mb-4 px-3 py-2 rounded-lg bg-neutral-bg border border-neutral-border text-sm text-neutral-text">
           {activeCompany
-            ? <span>📁 {activeCompany.name}</span>
+            ? <span>{activeCompany.name}</span>
             : <span className="text-red-400">No hay empresa seleccionada</span>}
         </div>
 
@@ -151,7 +151,7 @@ export default function UploadBalanceModal({ onClose, onSuccess }: Props) {
 
         {/* Success */}
         {success && (
-          <p className="text-xs text-green-500 mb-4">✅ Balance subido exitosamente</p>
+          <p className="text-xs text-green-500 mb-4">Balance subido exitosamente</p>
         )}
 
         {/* Botones */}
