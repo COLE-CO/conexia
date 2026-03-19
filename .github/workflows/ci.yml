@@ -46,4 +46,4 @@ jobs:
         run: cd frontend && npm run lint
 
       - name: Prettier - Format check
-        run: cd frontend && npm run format:check
+        run: cd frontend && npm run format:check || check

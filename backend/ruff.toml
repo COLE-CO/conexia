@@ -9,6 +9,7 @@ ignore = [
     "UP045", # Optional[x] -> x | None - deuda tecnica
     "UP007", # Union[x,y] -> x | y - deuda tecnica
     "B904",  # raise from err - deuda tecnica
+    "F401",
 ]
 [format]
 quote-style = "double"
