@@ -3,13 +3,7 @@ line-length = 88
 [lint]
 select = ["E", "F", "N", "I", "B", "UP"]
 ignore = [
-    "B008",  # Depends() en FastAPI es patron oficial, ignorar permanentemente
-    "I001",  # imports desordenados - deuda tecnica
-    "E501",  # lineas largas - deuda tecnica
-    "UP045", # Optional[x] -> x | None - deuda tecnica
-    "UP007", # Union[x,y] -> x | y - deuda tecnica
-    "B904",  # raise from err - deuda tecnica
-    "F401",
+    "B008",
 ]
 [format]
 quote-style = "double"

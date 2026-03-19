@@ -21,7 +21,7 @@ export default function CompanySelector() {
   return (
     <div className="relative">
       <button
-        onClick={() => setIsOpen(prev => !prev)}
+        onClick={() => setIsOpen((prev) => !prev)}
         className="flex items-center gap-2 px-3 py-2 rounded-lg bg-neutral-surface border border-neutral-border hover:bg-neutral-bg transition-colors duration-200 cursor-pointer"
       >
         <Building2 size={16} className="text-secondary" />
@@ -34,9 +34,11 @@ export default function CompanySelector() {
       {isOpen && (
         <div className="absolute top-full left-0 mt-1 w-56 bg-neutral-surface border border-neutral-border rounded-lg shadow-lg z-50">
           {companies.length === 0 ? (
-            <p className="text-sm text-neutral-muted p-3">No hay empresas registradas</p>
+            <p className="text-sm text-neutral-muted p-3">
+              No hay empresas registradas
+            </p>
           ) : (
-            companies.map(company => (
+            companies.map((company) => (
               <button
                 key={company.id}
                 onClick={() => {
@@ -45,9 +47,11 @@ export default function CompanySelector() {
                 }}
                 className={`
                   w-full text-left px-4 py-2.5 text-sm transition-colors duration-200 first:rounded-t-lg last:rounded-b-lg
-                  ${activeCompany?.id === company.id
-                    ? 'bg-primary text-white'
-                    : 'text-neutral-text hover:bg-neutral-bg'}
+                  ${
+                    activeCompany?.id === company.id
+                      ? 'bg-primary text-white'
+                      : 'text-neutral-text hover:bg-neutral-bg'
+                  }
                 `}
               >
                 {company.name}

@@ -11,7 +11,7 @@ export const login = async (username: string, password: string) => {
     },
   });
 
-  return response.data; 
+  return response.data;
 };
 
 export const getMe = async () => {
@@ -25,7 +25,7 @@ export const logout = () => {
 
 export const changePassword = async (newPassword: string) => {
   const response = await api.post('/auth/change-password', {
-    new_password: newPassword
+    new_password: newPassword,
   });
   return response.data;
 };

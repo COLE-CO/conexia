@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends, File, Form, UploadFile, HTTPException
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from src.core.database import get_db
-from src.modules.auth import dependencies as auth_dependencies, models as auth_models
+from src.modules.auth import dependencies as auth_dependencies
+from src.modules.auth import models as auth_models
+
 from . import schemas, service
 
 router = APIRouter(prefix="/balances", tags=["Balances"])
@@ -15,18 +17,14 @@ def upload_balance(
     month: int | None = Form(None),
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
-    current_user = Depends(
+    current_user=Depends(
         auth_dependencies.require_role(
             [auth_models.UserRole.ADMIN, auth_models.UserRole.CONTADOR_FAMILY_OFFICE]
         )
-    )
+    ),
 ):
     return service.upload_balance(
-        db=db,
-        file=file,
-        company_id=company_id,
-        year=year,
-        month=month
+        db=db, file=file, company_id=company_id, year=year, month=month
     )
 
 
@@ -38,19 +36,14 @@ def get_balances_by_company(
     day: int | None = None,
     search: str | None = None,
     db: Session = Depends(get_db),
-    current_user = Depends(
+    current_user=Depends(
         auth_dependencies.require_role(
             [auth_models.UserRole.ADMIN, auth_models.UserRole.CONTADOR_FAMILY_OFFICE]
         )
-    )
+    ),
 ):
     return service.get_balances_by_company(
-        db=db,
-        company_id=company_id,
-        year=year,
-        month=month,
-        day=day,
-        search=search
+        db=db, company_id=company_id, year=year, month=month, day=day, search=search
     )
 
 
@@ -58,11 +51,11 @@ def get_balances_by_company(
 def get_balance(
     balance_id: int,
     db: Session = Depends(get_db),
-    current_user = Depends(
+    current_user=Depends(
         auth_dependencies.require_role(
             [auth_models.UserRole.ADMIN, auth_models.UserRole.CONTADOR_FAMILY_OFFICE]
         )
-    )
+    ),
 ):
     balance = service.get_balance(db, balance_id)
 
@@ -76,11 +69,11 @@ def get_balance(
 def delete_balance(
     balance_id: int,
     db: Session = Depends(get_db),
-    current_user = Depends(
+    current_user=Depends(
         auth_dependencies.require_role(
             [auth_models.UserRole.ADMIN, auth_models.UserRole.CONTADOR_FAMILY_OFFICE]
         )
-    )
+    ),
 ):
     balance = service.delete_balance(db, balance_id)
 
@@ -94,10 +87,10 @@ def delete_balance(
 def download_balance(
     balance_id: int,
     db: Session = Depends(get_db),
-    current_user = Depends(
+    current_user=Depends(
         auth_dependencies.require_role(
             [auth_models.UserRole.ADMIN, auth_models.UserRole.CONTADOR_FAMILY_OFFICE]
         )
-    )
+    ),
 ):
     return service.get_balance_download_url(db, balance_id)

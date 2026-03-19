@@ -6,12 +6,14 @@ interface SidebarContextType {
   toggle: () => void;
 }
 
-const SidebarContext = createContext<SidebarContextType>({} as SidebarContextType);
+const SidebarContext = createContext<SidebarContextType>(
+  {} as SidebarContextType
+);
 
 export const SidebarProvider = ({ children }: { children: ReactNode }) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  const toggle = () => setIsExpanded(prev => !prev);
+  const toggle = () => setIsExpanded((prev) => !prev);
 
   return (
     <SidebarContext.Provider value={{ isExpanded, toggle }}>
@@ -20,4 +22,5 @@ export const SidebarProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useSidebar = () => useContext(SidebarContext);

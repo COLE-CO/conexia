@@ -28,12 +28,6 @@ export default defineConfig([
         { selector: 'function', format: ['camelCase', 'PascalCase'] },
         { selector: 'typeLike', format: ['PascalCase'] },
       ],
-      // Temporal - deuda tecnica registrada en issue
-      'react-refresh/only-export-components': 'warn',
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': 'warn',
-      'react-hooks/set-state-in-effect': 'warn',
-      'react-hooks/exhaustive-deps': 'warn',
     },
   },
 ])

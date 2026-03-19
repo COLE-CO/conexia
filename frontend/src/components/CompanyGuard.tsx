@@ -32,7 +32,6 @@ export default function CompanyGuard({ children }: Props) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-neutral-bg">
         <div className="bg-neutral-surface border border-neutral-border rounded-xl shadow-lg p-8 w-full max-w-md">
-          
           <div className="flex items-center gap-3 mb-6">
             <div className="bg-secondary rounded-lg w-10 h-10 flex items-center justify-center">
               <Building2 size={20} className="text-white" />
@@ -53,7 +52,7 @@ export default function CompanyGuard({ children }: Props) {
             </p>
           ) : (
             <div className="flex flex-col gap-2">
-              {companies.map(company => (
+              {companies.map((company) => (
                 <button
                   key={company.id}
                   onClick={() => setActiveCompany(company)}

@@ -24,7 +24,7 @@ jobs:
         run: cd backend && ruff check src/
 
       - name: Ruff - Format check
-        run: cd backend && ruff format --check src/ || true
+        run: cd backend && ruff format --check src/ 
 
       - name: Bandit - Security scan
         run: cd backend && bandit -r src/ -c bandit.yaml 
@@ -46,4 +46,4 @@ jobs:
         run: cd frontend && npm run lint
 
       - name: Prettier - Format check
-        run: cd frontend && npm run format:check || true
+        run: cd frontend && npm run format:check
