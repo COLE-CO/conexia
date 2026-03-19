@@ -1,0 +1,8 @@
+line-length = 88
+
+[lint]
+select = ["E", "F", "N", "I", "B", "UP"]
+ignore = []
+
+[format]
+quote-style = "double"

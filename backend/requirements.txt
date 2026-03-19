@@ -9,3 +9,6 @@ bcrypt==4.2.1
 python-multipart==0.0.20
 psycopg2-binary==2.9.11
 alembic==1.18.4
+boto3==1.37.13
+ruff==0.15.6
+bandit==1.9.4
