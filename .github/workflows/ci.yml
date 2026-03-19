@@ -1,0 +1,49 @@
+name: Code Quality Pipeline
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+
+      - name: Ruff - Lint
+        run: cd backend && ruff check src/
+
+      - name: Ruff - Format check
+        run: cd backend && ruff format --check src/
+
+      - name: Bandit - Security scan
+        run: cd backend && bandit -r src/ -c bandit.yaml 
+
+  frontend-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: cd frontend && npm ci
+
+      - name: ESLint
+        run: cd frontend && npm run lint
+
+      - name: Prettier - Format check
+        run: cd frontend && npm run format:check
