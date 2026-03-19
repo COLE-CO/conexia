@@ -1,6 +1,8 @@
-import uuid
 import os
+import uuid
+
 import boto3
+
 from src.core.config import settings
 
 
@@ -26,7 +28,7 @@ def upload_file_to_s3(file_obj, storage_key: str, content_type: str):
         file_obj,
         settings.AWS_BUCKET_NAME,
         storage_key,
-        ExtraArgs={"ContentType": content_type}
+        ExtraArgs={"ContentType": content_type},
     )
 
     return storage_key
@@ -38,9 +40,7 @@ def delete_file_from_s3(storage_key: str):
 
 
 def generate_presigned_download_url(
-    storage_key: str,
-    original_filename: str,
-    expires_in: int = 60
+    storage_key: str, original_filename: str, expires_in: int = 60
 ) -> str:
     s3 = get_s3_client()
     safe_filename = original_filename.replace('"', "")
@@ -52,5 +52,5 @@ def generate_presigned_download_url(
             "Key": storage_key,
             "ResponseContentDisposition": f'attachment; filename="{safe_filename}"',
         },
-        ExpiresIn=expires_in
+        ExpiresIn=expires_in,
     )

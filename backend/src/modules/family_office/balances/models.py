@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, func
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, func
+
 from src.core.database import Base
 
 
@@ -18,4 +19,6 @@ class Balance(Base):
     year = Column(Integer, nullable=False)
     month = Column(Integer, nullable=True)
 
-    uploaded_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    uploaded_at = Column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
