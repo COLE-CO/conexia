@@ -21,7 +21,6 @@ class Settings(BaseSettings):
     # S3
     AWS_ACCESS_KEY_ID: str
     AWS_SECRET_ACCESS_KEY: str
-    AWS_SESSION_TOKEN: str
     AWS_REGION: str
     AWS_BUCKET_NAME: str
 
