@@ -8,7 +8,7 @@ interface Props {
 
 export const ProtectedRoute = ({ children }: Props) => {
   const { isAuthenticated, user, loading } = useContext(AuthContext);
-  const location = useLocation(); 
+  const location = useLocation();
 
   if (loading) {
     return (

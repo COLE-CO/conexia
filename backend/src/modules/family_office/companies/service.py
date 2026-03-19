@@ -1,6 +1,7 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
+
 from . import models, schemas
 
 
@@ -12,12 +13,12 @@ def create_company(db: Session, company: schemas.CompanyCreate):
         db.commit()
         db.refresh(db_company)
         return db_company
-    except IntegrityError:
+    except IntegrityError as err:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Ya existe una empresa con ese NIT"
-        )
+            detail="Ya existe una empresa con ese NIT",
+        ) from err
 
 
 def get_companies(db: Session):
@@ -41,12 +42,12 @@ def update_company(db: Session, company_id: int, company_data: schemas.CompanyUp
         db.commit()
         db.refresh(company)
         return company
-    except IntegrityError:
+    except IntegrityError as err:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Ya existe una empresa con ese NIT"
-        )
+            detail="Ya existe una empresa con ese NIT",
+        ) from err
 
 
 def delete_company(db: Session, company_id: int):

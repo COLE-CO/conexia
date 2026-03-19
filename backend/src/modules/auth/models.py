@@ -1,11 +1,16 @@
-from sqlalchemy import Column, Integer, String, Boolean, Enum as SqlEnum
 import enum
+
+from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy import Enum as SqlEnum
+
 from src.core.database import Base
+
 
 class UserRole(str, enum.Enum):
     ADMIN = "admin"
     CONTADOR_COLE_CO = "contador_cole_co"
     CONTADOR_FAMILY_OFFICE = "contador_family_office"
+
 
 class User(Base):
     __tablename__ = "users"

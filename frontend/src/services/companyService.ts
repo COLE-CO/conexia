@@ -17,12 +17,17 @@ export const getCompany = async (id: number): Promise<Company> => {
   return response.data;
 };
 
-export const createCompany = async (data: Omit<Company, 'id'>): Promise<Company> => {
+export const createCompany = async (
+  data: Omit<Company, 'id'>
+): Promise<Company> => {
   const response = await api.post('/companies', data);
   return response.data;
 };
 
-export const updateCompany = async (id: number, data: Partial<Company>): Promise<Company> => {
+export const updateCompany = async (
+  id: number,
+  data: Partial<Company>
+): Promise<Company> => {
   const response = await api.put(`/companies/${id}`, data);
   return response.data;
 };

@@ -81,10 +81,11 @@ export default function UploadBalanceModal({ onClose, onSuccess }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-neutral-surface border border-neutral-border rounded-2xl shadow-2xl w-full max-w-md p-6 animate-fade-in-up">
-
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-neutral-text font-hubot">Subir balance</h2>
+          <h2 className="text-lg font-bold text-neutral-text font-hubot">
+            Subir balance
+          </h2>
           <button
             onClick={onClose}
             className="text-neutral-muted hover:text-neutral-text bg-transparent border-none cursor-pointer"
@@ -95,28 +96,34 @@ export default function UploadBalanceModal({ onClose, onSuccess }: Props) {
 
         {/* Empresa */}
         <div className="mb-4 px-3 py-2 rounded-lg bg-neutral-bg border border-neutral-border text-sm text-neutral-text">
-          {activeCompany
-            ? <span>{activeCompany.name}</span>
-            : <span className="text-red-400">No hay empresa seleccionada</span>}
+          {activeCompany ? (
+            <span>{activeCompany.name}</span>
+          ) : (
+            <span className="text-red-400">No hay empresa seleccionada</span>
+          )}
         </div>
 
         {/* Año y mes */}
         <div className="flex gap-3 mb-4">
           <div className="flex-1">
-            <label className="text-xs text-neutral-muted mb-1 block">Año *</label>
+            <label className="text-xs text-neutral-muted mb-1 block">
+              Año *
+            </label>
             <input
               type="number"
               value={year}
-              onChange={e => setYear(e.target.value)}
+              onChange={(e) => setYear(e.target.value)}
               className="w-full px-3 py-2 rounded-lg border border-neutral-border bg-neutral-bg text-sm text-neutral-text focus:outline-none focus:border-secondary"
               placeholder="2026"
             />
           </div>
           <div className="flex-1">
-            <label className="text-xs text-neutral-muted mb-1 block">Mes (opcional)</label>
+            <label className="text-xs text-neutral-muted mb-1 block">
+              Mes (opcional)
+            </label>
             <select
               value={month}
-              onChange={e => setMonth(e.target.value)}
+              onChange={(e) => setMonth(e.target.value)}
               className="w-full px-3 py-2 rounded-lg border border-neutral-border bg-neutral-bg text-sm text-neutral-text focus:outline-none focus:border-secondary"
             >
               <option value="">Todos</option>
@@ -135,7 +142,9 @@ export default function UploadBalanceModal({ onClose, onSuccess }: Props) {
           <span className="text-sm text-neutral-text font-medium">
             {file ? file.name : 'Haz click para seleccionar un archivo'}
           </span>
-          <span className="text-xs text-neutral-muted">PDF, XLSX o XLS · Máx. 15MB</span>
+          <span className="text-xs text-neutral-muted">
+            PDF, XLSX o XLS · Máx. 15MB
+          </span>
           <input
             type="file"
             accept=".pdf,.xlsx,.xls"
@@ -145,13 +154,13 @@ export default function UploadBalanceModal({ onClose, onSuccess }: Props) {
         </label>
 
         {/* Error */}
-        {error && (
-          <p className="text-xs text-red-400 mb-4">{error}</p>
-        )}
+        {error && <p className="text-xs text-red-400 mb-4">{error}</p>}
 
         {/* Success */}
         {success && (
-          <p className="text-xs text-green-500 mb-4">Balance subido exitosamente</p>
+          <p className="text-xs text-green-500 mb-4">
+            Balance subido exitosamente
+          </p>
         )}
 
         {/* Botones */}
@@ -171,7 +180,6 @@ export default function UploadBalanceModal({ onClose, onSuccess }: Props) {
             {loading ? 'Subiendo...' : 'Subir balance'}
           </button>
         </div>
-
       </div>
     </div>
   );

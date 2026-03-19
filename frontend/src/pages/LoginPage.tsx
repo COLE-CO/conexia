@@ -21,7 +21,7 @@ const LoginPage = () => {
       const data = await login(email, password);
       await loginState(data.access_token);
       navigate('/dashboard');
-    } catch (err: any) {
+    } catch {
       setError('Credenciales incorrectas o usuario no autorizado.');
     } finally {
       setLoading(false);
@@ -34,7 +34,11 @@ const LoginPage = () => {
         <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/5" />
         <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-white/5" />
         <div className="relative flex flex-col items-center gap-6">
-          <img src="/logo-conexia.svg" alt="Conexia" className="w-64 h-64 brightness-0 invert" />
+          <img
+            src="/logo-conexia.svg"
+            alt="Conexia"
+            className="w-64 h-64 brightness-0 invert"
+          />
           <p className="text-white/60 text-sm tracking-widest uppercase">
             Plataforma Conexia
           </p>

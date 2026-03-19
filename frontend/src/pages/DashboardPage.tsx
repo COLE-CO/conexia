@@ -29,13 +29,25 @@ const DashboardPage = () => {
         </div>
 
         <div className="bg-neutral-bg border border-neutral-border p-5 rounded-2xl mb-6">
-          <p className="text-sm text-neutral-text mb-2"><strong className="text-primary">Usuario:</strong> {user?.full_name}</p>
-          <p className="text-sm text-neutral-text mb-2"><strong className="text-primary">Email:</strong> {user?.email}</p>
-          <p className="text-sm text-neutral-text mb-2"><strong className="text-primary">Rol:</strong> <span className="uppercase text-primary font-bold">{user?.role}</span></p>
-          <p className="text-sm text-neutral-text"><strong className="text-primary">¿Debe cambiar clave?:</strong> {user?.must_change_password ? 'Sí (Bloqueado)' : 'No (Libre)'}</p>
+          <p className="text-sm text-neutral-text mb-2">
+            <strong className="text-primary">Usuario:</strong> {user?.full_name}
+          </p>
+          <p className="text-sm text-neutral-text mb-2">
+            <strong className="text-primary">Email:</strong> {user?.email}
+          </p>
+          <p className="text-sm text-neutral-text mb-2">
+            <strong className="text-primary">Rol:</strong>{' '}
+            <span className="uppercase text-primary font-bold">
+              {user?.role}
+            </span>
+          </p>
+          <p className="text-sm text-neutral-text">
+            <strong className="text-primary">¿Debe cambiar clave?:</strong>{' '}
+            {user?.must_change_password ? 'Sí (Bloqueado)' : 'No (Libre)'}
+          </p>
         </div>
 
-        <button 
+        <button
           onClick={handleLogout}
           className="bg-danger text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200 shadow-md"
         >

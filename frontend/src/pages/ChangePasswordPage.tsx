@@ -3,6 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { changePassword } from '../services/authService';
 import { AuthContext } from '../context/AuthContext';
 
+type ApiErrorResponse = {
+  response?: {
+    data?: {
+      detail?: string;
+    };
+  };
+};
+
 const ChangePasswordPage = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -30,8 +38,11 @@ const ChangePasswordPage = () => {
       await changePassword(newPassword);
       await refreshUser();
       navigate('/dashboard');
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Error al actualizar la contraseña');
+    } catch (err: unknown) {
+      const apiError = err as ApiErrorResponse;
+      setError(
+        apiError.response?.data?.detail || 'Error al actualizar la contraseña'
+      );
     } finally {
       setLoading(false);
     }
@@ -43,7 +54,11 @@ const ChangePasswordPage = () => {
         <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/5" />
         <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-white/5" />
         <div className="relative flex flex-col items-center gap-6">
-          <img src="/logo-conexia.svg" alt="Conexia" className="w-64 h-64 brightness-0 invert" />
+          <img
+            src="/logo-conexia.svg"
+            alt="Conexia"
+            className="w-64 h-64 brightness-0 invert"
+          />
           <p className="text-white/60 text-sm tracking-widest uppercase">
             Plataforma Conexia
           </p>
@@ -61,7 +76,8 @@ const ChangePasswordPage = () => {
               Actualización de Seguridad
             </h2>
             <p className="text-sm text-neutral-muted mb-8">
-              Por políticas de Conexia, debes asignar una nueva contraseña definitiva antes de continuar.
+              Por políticas de Conexia, debes asignar una nueva contraseña
+              definitiva antes de continuar.
             </p>
 
             {error && (
