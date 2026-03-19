@@ -96,4 +96,4 @@ Thumbs.db
 *.bak
 *.orig
 
-*.github
+*.github/prompts
