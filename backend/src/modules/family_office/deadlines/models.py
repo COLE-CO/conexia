@@ -4,11 +4,13 @@ from sqlalchemy import (
     Column,
     Date,
     DateTime,
-    Enum as SqlEnum,
     ForeignKey,
     Integer,
     String,
     func,
+)
+from sqlalchemy import (
+    Enum as SqlEnum,
 )
 
 from src.core.database import Base

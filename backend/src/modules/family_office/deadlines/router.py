@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from src.core.database import get_db
-from src.modules.auth import dependencies as auth_dependencies, models as auth_models
+from src.modules.auth import dependencies as auth_dependencies
+from src.modules.auth import models as auth_models
 
 from . import schemas, service
 
