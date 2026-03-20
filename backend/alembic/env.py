@@ -24,6 +24,7 @@ from src.core.database import Base
 from src.modules.auth import models
 from src.modules.family_office.companies import models as company_models
 from src.modules.family_office.balances import models as balance_models
+from src.modules.family_office.deadlines import models as deadline_models
 # =================================================================
 
 
