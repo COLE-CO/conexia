@@ -30,11 +30,7 @@ def get_deadlines_by_company(db: Session, company_id: int):
 
 
 def get_deadline(db: Session, deadline_id: int):
-    return (
-        db.query(models.Deadline)
-        .filter(models.Deadline.id == deadline_id)
-        .first()
-    )
+    return db.query(models.Deadline).filter(models.Deadline.id == deadline_id).first()
 
 
 def update_deadline(

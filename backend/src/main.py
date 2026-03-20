@@ -8,10 +8,7 @@ from src.modules.family_office.deadlines.router import router as deadlines_route
 
 app = FastAPI(title="Conexia API")
 
-origins = [
-    "http://localhost:3000",
-    "http://localhost:5173"
-]
+origins = ["http://localhost:3000", "http://localhost:5173"]
 
 app.add_middleware(
     CORSMiddleware,
