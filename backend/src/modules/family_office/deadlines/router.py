@@ -3,14 +3,22 @@ from sqlalchemy.orm import Session
 
 from src.core.database import get_db
 from src.modules.auth import dependencies as auth_dependencies, models as auth_models
+
 from . import schemas, service
 
 router = APIRouter(prefix="/deadlines", tags=["Deadlines"])
 
-ALLOWED_ROLES = [auth_models.UserRole.ADMIN, auth_models.UserRole.CONTADOR_FAMILY_OFFICE]
+ALLOWED_ROLES = [
+    auth_models.UserRole.ADMIN,
+    auth_models.UserRole.CONTADOR_FAMILY_OFFICE,
+]
 
 
-@router.post("/", response_model=schemas.DeadlineResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=schemas.DeadlineResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 def create_deadline(
     deadline: schemas.DeadlineCreate,
     db: Session = Depends(get_db),
@@ -36,7 +44,10 @@ def get_deadline(
 ):
     deadline = service.get_deadline(db, deadline_id)
     if not deadline:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vencimiento no encontrado")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Vencimiento no encontrado",
+        )
     return deadline
 
 
@@ -49,7 +60,10 @@ def update_deadline(
 ):
     updated = service.update_deadline(db, deadline_id, deadline_data)
     if not updated:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vencimiento no encontrado")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Vencimiento no encontrado",
+        )
     return updated
 
 
@@ -61,7 +75,10 @@ def confirm_deadline(
 ):
     confirmed = service.confirm_deadline(db, deadline_id)
     if not confirmed:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vencimiento no encontrado")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Vencimiento no encontrado",
+        )
     return confirmed
 
 
@@ -73,5 +90,8 @@ def delete_deadline(
 ):
     deleted = service.delete_deadline(db, deadline_id)
     if not deleted:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vencimiento no encontrado")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Vencimiento no encontrado",
+        )
     return {"message": "Vencimiento eliminado correctamente"}

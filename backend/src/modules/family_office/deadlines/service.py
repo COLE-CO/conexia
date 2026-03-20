@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from fastapi import HTTPException, status
+
 from . import models, schemas
 
 
@@ -22,7 +22,6 @@ def get_deadlines_by_company(db: Session, company_id: int):
         db.query(models.Deadline)
         .filter(models.Deadline.company_id == company_id)
         .order_by(
-            # Cumplidos al final, pendientes primero
             models.Deadline.status.desc(),
             models.Deadline.due_date.asc(),
         )
@@ -31,10 +30,16 @@ def get_deadlines_by_company(db: Session, company_id: int):
 
 
 def get_deadline(db: Session, deadline_id: int):
-    return db.query(models.Deadline).filter(models.Deadline.id == deadline_id).first()
+    return (
+        db.query(models.Deadline)
+        .filter(models.Deadline.id == deadline_id)
+        .first()
+    )
 
 
-def update_deadline(db: Session, deadline_id: int, deadline_data: schemas.DeadlineUpdate):
+def update_deadline(
+    db: Session, deadline_id: int, deadline_data: schemas.DeadlineUpdate
+):
     deadline = get_deadline(db, deadline_id)
 
     if not deadline:

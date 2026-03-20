@@ -1,5 +1,7 @@
-from pydantic import BaseModel
 from datetime import date, datetime
+
+from pydantic import BaseModel
+
 from .models import DeadlineStatus
 
 
