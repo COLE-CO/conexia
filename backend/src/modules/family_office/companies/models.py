@@ -15,5 +15,9 @@ class Company(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
-    balances = relationship("Balance", cascade="all, delete-orphan", passive_deletes=True)
-    deadlines = relationship("Deadline", cascade="all, delete-orphan", passive_deletes=True)
+    balances = relationship(
+        "Balance", cascade="all, delete-orphan", passive_deletes=True
+    )
+    deadlines = relationship(
+        "Deadline", cascade="all, delete-orphan", passive_deletes=True
+    )

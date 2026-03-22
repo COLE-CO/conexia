@@ -23,4 +23,6 @@ class Balance(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
-    company_id = Column(Integer, ForeignKey("companies.id", ondelete="CASCADE"), nullable=False)
+    company_id = Column(
+        Integer, ForeignKey("companies.id", ondelete="CASCADE"), nullable=False
+    )
