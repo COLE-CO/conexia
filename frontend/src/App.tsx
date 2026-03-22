@@ -12,9 +12,9 @@ import React from 'react';
 function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen">
+      <div className="flex h-screen overflow-hidden">
         <Sidebar />
-        <main className="flex-1 bg-neutral-bg">{children}</main>
+        <main className="flex-1 bg-neutral-bg overflow-y-auto">{children}</main>
       </div>
     </SidebarProvider>
   );
