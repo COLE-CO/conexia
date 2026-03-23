@@ -1,3 +1,4 @@
+from sqlalchemy import case
 from sqlalchemy.orm import Session
 
 from . import models, schemas
@@ -22,7 +23,10 @@ def get_deadlines_by_company(db: Session, company_id: int):
         db.query(models.Deadline)
         .filter(models.Deadline.company_id == company_id)
         .order_by(
-            models.Deadline.status.desc(),
+            case(
+                (models.Deadline.status == models.DeadlineStatus.PENDIENTE, 0),
+                else_=1,
+            ),
             models.Deadline.due_date.asc(),
         )
         .all()
