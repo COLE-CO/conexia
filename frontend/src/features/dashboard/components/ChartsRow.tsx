@@ -41,7 +41,9 @@ export default function ChartsRow({
               <h2 className="text-sm font-bold text-neutral-text">
                 Distribución de obligaciones
               </h2>
-              <span className="text-xs text-neutral-muted">{deadlinesCount} total</span>
+              <span className="text-xs text-neutral-muted">
+                {deadlinesCount} total
+              </span>
             </div>
             {dashboard.donutData.length === 0 ? (
               <div className="flex items-center justify-center h-52 text-sm text-neutral-muted">
@@ -68,7 +70,10 @@ export default function ChartsRow({
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value, name) => [value ?? 0, String(name ?? '')]}
+                    formatter={(value, name) => [
+                      value ?? 0,
+                      String(name ?? ''),
+                    ]}
                     contentStyle={{
                       fontSize: 12,
                       borderRadius: 10,
@@ -129,9 +134,17 @@ export default function ChartsRow({
                     iconSize={8}
                     wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
                   />
-                  <Bar dataKey="Pendiente" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                  <Bar
+                    dataKey="Pendiente"
+                    fill="#3B82F6"
+                    radius={[4, 4, 0, 0]}
+                  />
                   <Bar dataKey="Vencido" fill="#EF4444" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="Cumplido" fill="#22C55E" radius={[4, 4, 0, 0]} />
+                  <Bar
+                    dataKey="Cumplido"
+                    fill="#22C55E"
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             )}

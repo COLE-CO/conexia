@@ -39,9 +39,7 @@ export default function StatCard({
           {icon}
         </span>
       </div>
-      <p
-        className="text-4xl font-bold tracking-tight mb-1 text-neutral-text"
-      >
+      <p className="text-4xl font-bold tracking-tight mb-1 text-neutral-text">
         {value}
       </p>
       <p className="text-xs leading-relaxed text-neutral-muted">

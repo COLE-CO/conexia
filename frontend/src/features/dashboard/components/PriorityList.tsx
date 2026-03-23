@@ -47,7 +47,9 @@ export default function PriorityList({
     <section className="bg-neutral-surface border border-neutral-border rounded-2xl shadow-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-neutral-border flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-bold text-neutral-text">Prioridades inmediatas</h2>
+          <h2 className="text-sm font-bold text-neutral-text">
+            Prioridades inmediatas
+          </h2>
           {!loading && dashboard.urgentItems.length > 0 && (
             <p className="text-xs text-neutral-muted mt-0.5">
               Vencimientos dentro de los próximos {dateRange} días
@@ -63,7 +65,9 @@ export default function PriorityList({
       </div>
 
       {error ? (
-        <div className="px-6 py-10 text-sm text-red-500 text-center">{error}</div>
+        <div className="px-6 py-10 text-sm text-red-500 text-center">
+          {error}
+        </div>
       ) : loading ? (
         <ul className="divide-y divide-neutral-border">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -128,7 +132,8 @@ export default function PriorityList({
           {dashboard.hiddenCount > 0 && (
             <div className="px-6 py-3.5 border-t border-neutral-border bg-neutral-bg/50 flex items-center justify-between">
               <p className="text-xs text-neutral-muted">
-                Mostrando 6 de {dashboard.urgentItems.length + dashboard.hiddenCount}{' '}
+                Mostrando 6 de{' '}
+                {dashboard.urgentItems.length + dashboard.hiddenCount}{' '}
                 prioridades
               </p>
               <button

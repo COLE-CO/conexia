@@ -16,8 +16,8 @@ export default function NoDashboardAccess({
           Dashboard Operativo
         </h1>
         <p className="text-sm text-neutral-muted mb-6">
-          Para este rol se mostrará el resumen del módulo COLE/CO en una
-          próxima iteración.
+          Para este rol se mostrará el resumen del módulo COLE/CO en una próxima
+          iteración.
         </p>
         <div className="bg-neutral-bg border border-neutral-border p-5 rounded-xl mb-6 space-y-2">
           <p className="text-sm text-neutral-text">

@@ -67,7 +67,9 @@ export default function ColeCoDashboard({
                 {icon}
               </span>
             </div>
-            <p className="text-4xl font-bold text-neutral-text tracking-tight">--</p>
+            <p className="text-4xl font-bold text-neutral-text tracking-tight">
+              --
+            </p>
           </article>
         ))}
       </div>

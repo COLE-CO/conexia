@@ -23,7 +23,8 @@ const DashboardPage = () => {
   const { clearActiveCompany } = useCompany();
   const navigate = useNavigate();
   const [dateRange, setDateRange] = useState<DateRangeOption>(10);
-  const [adminDomain, setAdminDomain] = useState<DashboardDomain>('family_office');
+  const [adminDomain, setAdminDomain] =
+    useState<DashboardDomain>('family_office');
 
   const handleLogout = () => {
     logout();
@@ -46,11 +47,14 @@ const DashboardPage = () => {
       : 'cole_co';
 
   const canSeeFamilyOfficeDashboard =
-    (isAdmin || isFamilyOfficeRole) && activeDashboardDomain === 'family_office';
+    (isAdmin || isFamilyOfficeRole) &&
+    activeDashboardDomain === 'family_office';
 
   const canSeeColeCoDashboard =
     (isAdmin || isColeCoRole) && activeDashboardDomain === 'cole_co';
-  const { deadlines, loading, error } = useDashboardData(canSeeFamilyOfficeDashboard);
+  const { deadlines, loading, error } = useDashboardData(
+    canSeeFamilyOfficeDashboard
+  );
   const dashboard = useDashboardMetrics(deadlines, dateRange);
   const currentDateText = new Date().toLocaleDateString('es-CL', {
     weekday: 'long',
@@ -72,7 +76,6 @@ const DashboardPage = () => {
   return (
     <div className="min-h-screen bg-neutral-bg">
       <div className="max-w-6xl mx-auto px-6 py-8">
-
         {isAdmin && (
           <DomainSwitcher
             activeDashboardDomain={activeDashboardDomain}
@@ -96,8 +99,16 @@ const DashboardPage = () => {
             />
 
             <DateRangeSelector dateRange={dateRange} onChange={setDateRange} />
-            <MetricsGrid loading={loading} dashboard={dashboard} dateRange={dateRange} />
-            <ChartsRow loading={loading} dashboard={dashboard} deadlinesCount={deadlines.length} />
+            <MetricsGrid
+              loading={loading}
+              dashboard={dashboard}
+              dateRange={dateRange}
+            />
+            <ChartsRow
+              loading={loading}
+              dashboard={dashboard}
+              deadlinesCount={deadlines.length}
+            />
             <PriorityList
               loading={loading}
               error={error}
