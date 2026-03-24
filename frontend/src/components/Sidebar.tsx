@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useCompany } from '../context/CompanyContext';
 import { useSidebar } from '../context/SidebarContext';
 import {
   LayoutDashboard,
@@ -51,6 +52,7 @@ const mainItems = [
 export default function Sidebar() {
   const { isExpanded, toggle } = useSidebar();
   const { logout, user } = useContext(AuthContext);
+  const { clearActiveCompany } = useCompany();
   const navigate = useNavigate();
   const roleLabel = user?.role?.replaceAll('_', ' ');
 
@@ -103,6 +105,11 @@ export default function Sidebar() {
               <NavLink
                 key={path}
                 to={path}
+                onClick={() => {
+                  if (path === '/family-office') {
+                    clearActiveCompany();
+                  }
+                }}
                 className={({ isActive }) => `
                   flex items-center gap-3 pl-2.5 pr-3 py-2.5 rounded-lg mb-1 no-underline transition-all duration-200 border-l-2
                   ${!isExpanded ? 'justify-center' : ''}
