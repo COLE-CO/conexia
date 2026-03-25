@@ -330,23 +330,25 @@ export default function FamilyOfficePage() {
         {loadingDeadlines ? (
           <div className="text-center py-12 text-neutral-muted text-sm animate-pulse">Cargando vencimientos...</div>
         ) : deadlines.length === 0 ? (
-          <div className="p-12 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-neutral-bg border border-neutral-border flex items-center justify-center mx-auto mb-4">
-              <CalendarClock size={24} className="text-neutral-muted" />
+          <div className="bg-neutral-surface border border-neutral-border rounded-2xl p-12 text-center shadow-sm">
+            <div className="p-12 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-neutral-bg border border-neutral-border flex items-center justify-center mx-auto mb-4">
+                <CalendarClock size={24} className="text-neutral-muted" />
+              </div>
+              <p className="text-sm font-semibold text-neutral-text mb-1">No hay obligaciones registradas</p>
+              <p className="text-xs text-neutral-muted mb-6">
+                {activeCompany ? `Crea la primera obligación para ${activeCompany.name}` : 'Selecciona una empresa'}
+              </p>
+              {activeCompany && (
+                <button
+                  onClick={() => { setEditingDeadline(null); setShowDeadlineModal(true); }}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-hover transition-colors duration-200 shadow-md shadow-primary/20"
+                >
+                  <Plus size={15} />
+                  Nueva obligación
+                </button>
+              )}
             </div>
-            <p className="text-sm font-semibold text-neutral-text mb-1">No hay obligaciones registradas</p>
-            <p className="text-xs text-neutral-muted mb-6">
-              {activeCompany ? `Crea la primera obligación para ${activeCompany.name}` : 'Selecciona una empresa'}
-            </p>
-            {activeCompany && (
-              <button
-                onClick={() => { setEditingDeadline(null); setShowDeadlineModal(true); }}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-hover transition-colors duration-200 shadow-md shadow-primary/20"
-              >
-                <Plus size={15} />
-                Nueva obligación
-              </button>
-            )}
           </div>
         ) : (
           <div className="bg-neutral-surface border border-neutral-border rounded-2xl shadow-sm overflow-hidden">
