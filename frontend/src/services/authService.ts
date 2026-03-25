@@ -1,5 +1,25 @@
 import api from './api';
 
+export interface UserProfile {
+  id: number;
+  email: string;
+  full_name: string | null;
+  role: string;
+  is_active: boolean;
+  must_change_password: boolean;
+  alert_deadlines_enabled: boolean;
+  alert_balances_enabled: boolean;
+  alert_reports_enabled: boolean;
+}
+
+export interface UpdateProfilePayload {
+  full_name: string;
+  email: string;
+  alert_deadlines_enabled: boolean;
+  alert_balances_enabled: boolean;
+  alert_reports_enabled: boolean;
+}
+
 export const login = async (username: string, password: string) => {
   const formData = new URLSearchParams();
   formData.append('username', username);
@@ -15,7 +35,12 @@ export const login = async (username: string, password: string) => {
 };
 
 export const getMe = async () => {
-  const response = await api.get('/auth/me');
+  const response = await api.get<UserProfile>('/auth/me');
+  return response.data;
+};
+
+export const updateMe = async (payload: UpdateProfilePayload) => {
+  const response = await api.put<UserProfile>('/auth/me', payload);
   return response.data;
 };
 
