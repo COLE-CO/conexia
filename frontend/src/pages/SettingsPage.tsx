@@ -229,7 +229,9 @@ export default function SettingsPage() {
             {message && (
               <p className="text-sm font-medium text-secondary">{message}</p>
             )}
-            {error && <p className="text-sm font-medium text-danger">{error}</p>}
+            {error && (
+              <p className="text-sm font-medium text-danger">{error}</p>
+            )}
             {!message && !error && (
               <p className="text-sm text-neutral-muted">
                 Los cambios se aplicarán a tu sesión y se guardarán en tu
