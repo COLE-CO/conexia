@@ -13,9 +13,10 @@ vi.mock('../services/authService', () => ({
 }));
 
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>(
-    'react-router-dom'
-  );
+  const actual =
+    await vi.importActual<typeof import('react-router-dom')>(
+      'react-router-dom'
+    );
 
   return {
     ...actual,
@@ -79,7 +80,9 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: /acceder/i }));
 
     expect(
-      await screen.findByText(/credenciales incorrectas o usuario no autorizado/i)
+      await screen.findByText(
+        /credenciales incorrectas o usuario no autorizado/i
+      )
     ).toBeInTheDocument();
     expect(navigateMock).not.toHaveBeenCalled();
   });

@@ -61,9 +61,7 @@ vi.mock('../features/dashboard/components/FamilyOfficeHeader', () => ({
   }: {
     onCreateObligation: () => void;
     currentDateText: string;
-  }) => (
-    <button onClick={onCreateObligation}>Crear obligación</button>
-  ),
+  }) => <button onClick={onCreateObligation}>Crear obligación</button>,
 }));
 
 vi.mock('../features/dashboard/components/DateRangeSelector', () => ({
@@ -83,9 +81,10 @@ vi.mock('../features/dashboard/components/PriorityList', () => ({
 }));
 
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>(
-    'react-router-dom'
-  );
+  const actual =
+    await vi.importActual<typeof import('react-router-dom')>(
+      'react-router-dom'
+    );
 
   return {
     ...actual,
@@ -168,9 +167,7 @@ describe('DashboardPage', () => {
 
     renderPage(baseUser);
 
-    await user.click(
-      screen.getByRole('button', { name: /crear obligaci.n/i })
-    );
+    await user.click(screen.getByRole('button', { name: /crear obligaci.n/i }));
 
     expect(clearActiveCompanyMock).toHaveBeenCalled();
     expect(navigateMock).toHaveBeenCalledWith(

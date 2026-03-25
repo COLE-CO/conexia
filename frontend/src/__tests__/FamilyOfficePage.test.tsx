@@ -3,7 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 
 import FamilyOfficePage from '../pages/FamilyOfficePage';
-import { getBalancesByCompany, deleteBalance } from '../services/balanceService';
+import {
+  getBalancesByCompany,
+  deleteBalance,
+} from '../services/balanceService';
 import { getCompanies } from '../services/companyService';
 import { getDeadlinesByCompany } from '../services/deadlineService';
 
@@ -38,14 +41,12 @@ const getBalancesByCompanyMock = vi.mocked(getBalancesByCompany);
 const deleteBalanceMock = vi.mocked(deleteBalance);
 const getDeadlinesByCompanyMock = vi.mocked(getDeadlinesByCompany);
 
-let activeCompanyState:
-  | {
-      id: number;
-      name: string;
-      nit?: string;
-      logo_url?: string;
-    }
-  | null;
+let activeCompanyState: {
+  id: number;
+  name: string;
+  nit?: string;
+  logo_url?: string;
+} | null;
 
 function renderPage() {
   render(
@@ -114,7 +115,10 @@ describe('FamilyOfficePage', () => {
 
   it('solicita confirmacion antes de eliminar un balance y lo elimina al confirmar', async () => {
     const user = userEvent.setup();
-    vi.stubGlobal('confirm', vi.fn(() => true));
+    vi.stubGlobal(
+      'confirm',
+      vi.fn(() => true)
+    );
 
     renderPage();
 
@@ -131,7 +135,10 @@ describe('FamilyOfficePage', () => {
 
   it('conserva el balance cuando el usuario cancela la eliminacion', async () => {
     const user = userEvent.setup();
-    vi.stubGlobal('confirm', vi.fn(() => false));
+    vi.stubGlobal(
+      'confirm',
+      vi.fn(() => false)
+    );
 
     renderPage();
 
