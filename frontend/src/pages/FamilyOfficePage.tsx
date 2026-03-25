@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useCompany } from '../context/CompanyContext';
+import { useSearchParams } from 'react-router-dom';
 import CompanySelector from '../components/CompanySelector';
 import {
   getBalancesByCompany,
@@ -60,9 +61,17 @@ const metrics = [
 
 type Tab = 'balances' | 'vencimientos' | 'cartera';
 
+const getTabFromParam = (value: string | null): Tab | null => {
+  if (value === 'balances' || value === 'vencimientos' || value === 'cartera') {
+    return value;
+  }
+  return null;
+};
+
 export default function FamilyOfficePage() {
   const { activeCompany } = useCompany();
   const [activeTab, setActiveTab] = useState<Tab>('balances');
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Balances
   const [balances, setBalances] = useState<Balance[]>([]);
@@ -81,6 +90,36 @@ export default function FamilyOfficePage() {
   const loadingBalances =
     !!activeCompany && loadedCompanyId !== activeCompany.id;
   const visibleBalances = activeCompany ? balances : [];
+
+  useEffect(() => {
+    const tabFromUrl = getTabFromParam(searchParams.get('tab'));
+    if (tabFromUrl && tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams, activeTab]);
+
+  useEffect(() => {
+    const action = searchParams.get('action');
+    const tabFromUrl = getTabFromParam(searchParams.get('tab'));
+
+    if (tabFromUrl && tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+      return;
+    }
+
+    if (
+      action === 'new-obligation' &&
+      activeTab === 'vencimientos' &&
+      activeCompany
+    ) {
+      setEditingDeadline(null);
+      setShowDeadlineModal(true);
+
+      const next = new URLSearchParams(searchParams);
+      next.delete('action');
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchParams, activeTab, activeCompany, setSearchParams]);
 
   // Cargar balances
   useEffect(() => {
@@ -255,7 +294,13 @@ export default function FamilyOfficePage() {
         {(['balances', 'vencimientos', 'cartera'] as Tab[]).map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => {
+              setActiveTab(tab);
+              const next = new URLSearchParams(searchParams);
+              next.set('tab', tab);
+              next.delete('action');
+              setSearchParams(next, { replace: true });
+            }}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium capitalize transition-all duration-200
               ${
                 activeTab === tab
