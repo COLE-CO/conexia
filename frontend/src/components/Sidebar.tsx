@@ -193,7 +193,9 @@ export default function Sidebar() {
       {/* Botón toggle flotante */}
       <button
         onClick={toggle}
-        aria-label={isExpanded ? 'Minimizar barra lateral' : 'Expandir barra lateral'}
+        aria-label={
+          isExpanded ? 'Minimizar barra lateral' : 'Expandir barra lateral'
+        }
         className="absolute -right-3 top-6 z-10 bg-white border border-neutral-border rounded-full w-6 h-6 flex items-center justify-center cursor-pointer shadow-md hover:shadow-lg transition-shadow duration-200"
       >
         {isExpanded ? (
