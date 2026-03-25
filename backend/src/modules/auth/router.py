@@ -76,3 +76,22 @@ def read_users_me(
     current_user: models.User = Depends(dependencies.get_current_active_user),
 ):
     return current_user
+
+
+@router.put("/me", response_model=schemas.UserResponse)
+def update_my_profile(
+    profile_data: schemas.UserProfileUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(dependencies.get_current_active_user),
+):
+    if profile_data.email != current_user.email:
+        raise HTTPException(
+            status_code=400,
+            detail="Email cannot be changed from profile settings",
+        )
+
+    existing_user = service.get_user_by_email(db, email=profile_data.email)
+    if existing_user and existing_user.id != current_user.id:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    return service.update_user_profile(db, current_user, profile_data)

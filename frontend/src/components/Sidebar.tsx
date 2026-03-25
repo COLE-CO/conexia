@@ -53,6 +53,10 @@ export default function Sidebar() {
   const { logout, user } = useContext(AuthContext);
   const navigate = useNavigate();
   const roleLabel = user?.role?.replaceAll('_', ' ');
+  const hasEnabledAlerts =
+    user?.alert_deadlines_enabled ||
+    user?.alert_balances_enabled ||
+    user?.alert_reports_enabled;
 
   const handleLogout = () => {
     logout();
@@ -124,23 +128,27 @@ export default function Sidebar() {
         {/* Sección inferior */}
         <div className="px-2 pb-2 flex flex-col gap-1">
           {/* Notificaciones */}
-          <NavLink
-            to="/notificaciones"
-            className={({ isActive }) => `
-              flex items-center gap-3 pl-2.5 pr-3 py-2.5 rounded-lg no-underline transition-all duration-200 border-l-2
-              ${!isExpanded ? 'justify-center' : ''}
-              ${
-                isActive
-                  ? 'border-secondary bg-primary-hover text-white shadow-lg shadow-black/20'
-                  : 'border-transparent text-neutral-border hover:bg-primary-hover hover:text-white hover:translate-x-[1px]'
-              }
-            `}
-          >
-            <Bell size={20} className="flex-shrink-0" />
-            {isExpanded && (
-              <span className="text-sm whitespace-nowrap">Notificaciones</span>
-            )}
-          </NavLink>
+          {hasEnabledAlerts && (
+            <NavLink
+              to="/notificaciones"
+              className={({ isActive }) => `
+                flex items-center gap-3 pl-2.5 pr-3 py-2.5 rounded-lg no-underline transition-all duration-200 border-l-2
+                ${!isExpanded ? 'justify-center' : ''}
+                ${
+                  isActive
+                    ? 'border-secondary bg-primary-hover text-white shadow-lg shadow-black/20'
+                    : 'border-transparent text-neutral-border hover:bg-primary-hover hover:text-white hover:translate-x-[1px]'
+                }
+              `}
+            >
+              <Bell size={20} className="flex-shrink-0" />
+              {isExpanded && (
+                <span className="text-sm whitespace-nowrap">
+                  Notificaciones
+                </span>
+              )}
+            </NavLink>
+          )}
 
           {/* Ajustes */}
           <NavLink
@@ -178,6 +186,7 @@ export default function Sidebar() {
       {/* Botón toggle flotante */}
       <button
         onClick={toggle}
+        aria-label={isExpanded ? 'Minimizar barra lateral' : 'Expandir barra lateral'}
         className="absolute -right-3 top-6 z-10 bg-white border border-neutral-border rounded-full w-6 h-6 flex items-center justify-center cursor-pointer shadow-md hover:shadow-lg transition-shadow duration-200"
       >
         {isExpanded ? (

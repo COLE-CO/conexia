@@ -28,3 +28,17 @@ def authenticate_user(db: Session, email: str, password: str):
     if not security.verify_password(password, user.hashed_password):
         return False
     return user
+
+
+def update_user_profile(
+    db: Session, user: models.User, profile_data: schemas.UserProfileUpdate
+):
+    user.full_name = profile_data.full_name
+    user.email = profile_data.email
+    user.alert_deadlines_enabled = profile_data.alert_deadlines_enabled
+    user.alert_balances_enabled = profile_data.alert_balances_enabled
+    user.alert_reports_enabled = profile_data.alert_reports_enabled
+
+    db.commit()
+    db.refresh(user)
+    return user

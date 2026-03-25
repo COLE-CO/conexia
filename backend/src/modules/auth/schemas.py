@@ -28,6 +28,9 @@ class UserResponse(UserBase):
     id: int
     is_active: bool
     must_change_password: bool
+    alert_deadlines_enabled: bool
+    alert_balances_enabled: bool
+    alert_reports_enabled: bool
 
     class Config:
         from_attributes = True
@@ -35,3 +38,11 @@ class UserResponse(UserBase):
 
 class PasswordChangeRequest(BaseModel):
     new_password: str
+
+
+class UserProfileUpdate(BaseModel):
+    full_name: str | None = None
+    email: EmailStr
+    alert_deadlines_enabled: bool
+    alert_balances_enabled: bool
+    alert_reports_enabled: bool

@@ -8,6 +8,8 @@ import Sidebar from './components/Sidebar';
 import CompanyGuard from './components/CompanyGuard';
 import FamilyOfficePage from './pages/FamilyOfficePage';
 import React from 'react';
+import SettingsPage from './pages/SettingsPage';
+import NotificationsPage from './pages/NotificationsPage';
 
 function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   return (
@@ -93,7 +95,7 @@ function App() {
           element={
             <ProtectedRoute>
               <LayoutWithSidebar>
-                <h1 className="p-6">Ajustes</h1>
+                <SettingsPage />
               </LayoutWithSidebar>
             </ProtectedRoute>
           }
@@ -103,7 +105,7 @@ function App() {
           element={
             <ProtectedRoute>
               <LayoutWithSidebar>
-                <h1 className="p-6">Notificaciones</h1>
+                <NotificationsPage />
               </LayoutWithSidebar>
             </ProtectedRoute>
           }

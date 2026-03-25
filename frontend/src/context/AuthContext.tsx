@@ -1,22 +1,20 @@
 import { createContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import { getMe, logout as logoutService } from '../services/authService';
-
-export interface User {
-  id: number;
-  email: string;
-  full_name: string;
-  role: string;
-  must_change_password: boolean;
-}
+import {
+  getMe,
+  logout as logoutService,
+  type UserProfile,
+} from '../services/authService';
 
 interface AuthContextType {
-  user: User | null;
+  user: UserProfile | null;
   isAuthenticated: boolean;
   loading: boolean;
   loginState: (token: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  patchUser: (changes: Partial<UserProfile>) => void;
+  setUser: (nextUser: UserProfile | null) => void;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -25,7 +23,7 @@ export const AuthContext = createContext<AuthContextType>(
 );
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   const logout = useCallback(() => {
@@ -59,6 +57,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await fetchUser();
   };
 
+  const patchUser = useCallback((changes: Partial<UserProfile>) => {
+    setUser((currentUser) =>
+      currentUser ? { ...currentUser, ...changes } : currentUser
+    );
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -68,6 +72,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         loginState,
         logout,
         refreshUser: fetchUser,
+        patchUser,
+        setUser,
       }}
     >
       {children}

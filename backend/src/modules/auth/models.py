@@ -22,3 +22,6 @@ class User(Base):
     role = Column(SqlEnum(UserRole), default=UserRole.CONTADOR_COLE_CO, nullable=False)
     is_active = Column(Boolean, default=True)
     must_change_password = Column(Boolean, default=True)
+    alert_deadlines_enabled = Column(Boolean, default=True, nullable=False)
+    alert_balances_enabled = Column(Boolean, default=True, nullable=False)
+    alert_reports_enabled = Column(Boolean, default=True, nullable=False)
