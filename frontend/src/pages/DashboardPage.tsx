@@ -65,11 +65,11 @@ const DashboardPage = () => {
 
   if (!canSeeFamilyOfficeDashboard && !canSeeColeCoDashboard) {
     return (
-        <NoDashboardAccess
-          fullName={user?.full_name ?? undefined}
-          role={user?.role}
-          onLogout={handleLogout}
-        />
+      <NoDashboardAccess
+        fullName={user?.full_name ?? undefined}
+        role={user?.role}
+        onLogout={handleLogout}
+      />
     );
   }
 
