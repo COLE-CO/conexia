@@ -5,6 +5,8 @@ import CompanySelector from '../components/CompanySelector';
 import {
   getBalancesByCompany,
   deleteBalance,
+  downloadBalance,
+  viewBalance,
 } from '../services/balanceService';
 import type { Balance } from '../services/balanceService';
 import {
@@ -27,9 +29,9 @@ import {
   Eye,
   Download,
   Trash2,
-  Triangle,
   CalendarClock,
   Plus,
+  ArrowLeft,
 } from 'lucide-react';
 
 const metrics = [
@@ -62,21 +64,25 @@ const metrics = [
 type Tab = 'balances' | 'vencimientos' | 'cartera';
 
 const getTabFromParam = (value: string | null): Tab | null => {
-  if (value === 'balances' || value === 'vencimientos' || value === 'cartera') {
+  if (value === 'balances' || value === 'vencimientos' || value === 'cartera')
     return value;
-  }
   return null;
 };
 
 export default function FamilyOfficePage() {
-  const { activeCompany } = useCompany();
-  const [activeTab, setActiveTab] = useState<Tab>('balances');
+  const { activeCompany, clearActiveCompany } = useCompany();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Fuente única de verdad del tab (sin useState)
+  const activeTab: Tab = getTabFromParam(searchParams.get('tab')) || 'balances';
 
   // Balances
   const [balances, setBalances] = useState<Balance[]>([]);
   const [loadedCompanyId, setLoadedCompanyId] = useState<number | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [confirmDeleteBalance, setConfirmDeleteBalance] = useState<
+    number | null
+  >(null);
 
   // Vencimientos
   const [deadlines, setDeadlines] = useState<Deadline[]>([]);
@@ -91,35 +97,39 @@ export default function FamilyOfficePage() {
     !!activeCompany && loadedCompanyId !== activeCompany.id;
   const visibleBalances = activeCompany ? balances : [];
 
-  useEffect(() => {
-    const tabFromUrl = getTabFromParam(searchParams.get('tab'));
-    if (tabFromUrl && tabFromUrl !== activeTab) {
-      setActiveTab(tabFromUrl);
-    }
-  }, [searchParams, activeTab]);
+  const sortDeadlines = (list: Deadline[]) => {
+    const pendientes = list
+      .filter((d) => d.status === 'pendiente')
+      .sort(
+        (a, b) =>
+          new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+      );
+    const cumplidos = list
+      .filter((d) => d.status === 'cumplido')
+      .sort(
+        (a, b) =>
+          new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+      );
+    return [...pendientes, ...cumplidos];
+  };
+
+  const hasNewObligationAction =
+    searchParams.get('action') === 'new-obligation' &&
+    activeTab === 'vencimientos' &&
+    !!activeCompany;
+
+  const isDeadlineModalVisible = showDeadlineModal || hasNewObligationAction;
+  const effectiveEditingDeadline = hasNewObligationAction
+    ? null
+    : editingDeadline;
 
   useEffect(() => {
-    const action = searchParams.get('action');
-    const tabFromUrl = getTabFromParam(searchParams.get('tab'));
+    if (!hasNewObligationAction) return;
 
-    if (tabFromUrl && tabFromUrl !== activeTab) {
-      setActiveTab(tabFromUrl);
-      return;
-    }
-
-    if (
-      action === 'new-obligation' &&
-      activeTab === 'vencimientos' &&
-      activeCompany
-    ) {
-      setEditingDeadline(null);
-      setShowDeadlineModal(true);
-
-      const next = new URLSearchParams(searchParams);
-      next.delete('action');
-      setSearchParams(next, { replace: true });
-    }
-  }, [searchParams, activeTab, activeCompany, setSearchParams]);
+    const next = new URLSearchParams(searchParams);
+    next.delete('action');
+    setSearchParams(next, { replace: true });
+  }, [hasNewObligationAction, searchParams, setSearchParams]);
 
   // Cargar balances
   useEffect(() => {
@@ -146,42 +156,48 @@ export default function FamilyOfficePage() {
   // Cargar vencimientos
   useEffect(() => {
     if (!activeCompany) return;
+    let cancelled = false;
 
     const loadDeadlines = async () => {
       setLoadingDeadlines(true);
+
       try {
         const data = await getDeadlinesByCompany(activeCompany.id);
-        setDeadlines(sortDeadlines(data));
+        if (!cancelled) {
+          setDeadlines(sortDeadlines(data));
+        }
       } catch {
-        setDeadlines([]);
+        if (!cancelled) {
+          setDeadlines([]);
+        }
       } finally {
-        setLoadingDeadlines(false);
+        if (!cancelled) {
+          setLoadingDeadlines(false);
+        }
       }
     };
 
-    loadDeadlines();
+    void loadDeadlines();
+
+    return () => {
+      cancelled = true;
+    };
   }, [activeCompany]);
 
   const handleDeleteBalance = async (balanceId: number) => {
-    if (!confirm('¿Seguro que deseas eliminar este balance?')) return;
     await deleteBalance(balanceId);
     setBalances((prev) => prev.filter((b) => b.id !== balanceId));
+    setConfirmDeleteBalance(null);
   };
 
-  const sortDeadlines = (list: Deadline[]) => {
-    const pendientes = list
-      .filter((d) => d.status === 'pendiente')
-      .sort(
-        (a, b) =>
-          new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
-      );
-    const cumplidos = list
-      .filter((d) => d.status === 'cumplido')
-      .sort(
-        (a, b) =>
-          new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
-      );
-    return [...pendientes, ...cumplidos];
+  const handleViewBalance = async (balanceId: number, fileName: string) => {
+    const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
+    if (isExcel) {
+      await downloadBalance(balanceId);
+      return;
+    }
+    const url = await viewBalance(balanceId);
+    window.open(url, '_blank');
   };
 
   const handleConfirmDeadline = async (id: number) => {
@@ -236,33 +252,38 @@ export default function FamilyOfficePage() {
             <Sparkles size={16} />
             Generar reporte IA
           </button>
-          {activeTab === 'balances' && (
+          <div className={activeTab === 'balances' ? 'block' : 'hidden'}>
             <button
               onClick={() => setShowUploadModal(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm hover:bg-primary-hover transition-colors duration-200 shadow-md"
+              className="flex items-center justify-center gap-2 min-w-[180px] px-4 py-2 rounded-lg bg-primary text-white text-sm ..."
             >
               <Upload size={16} />
               Subir balance
             </button>
-          )}
-          {activeTab === 'vencimientos' && (
+          </div>
+          <div className={activeTab === 'vencimientos' ? 'block' : 'hidden'}>
             <button
               onClick={() => {
                 setEditingDeadline(null);
                 setShowDeadlineModal(true);
               }}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm hover:bg-primary-hover transition-colors duration-200 shadow-md"
+              className="flex items-center justify-center gap-2 min-w-[180px] px-4 py-2 rounded-lg bg-primary text-white text-sm ..."
             >
               <Plus size={16} />
               Nueva obligación
             </button>
-          )}
+          </div>
         </div>
       </div>
 
       {/* Selector de empresa */}
       <div className="relative z-40 flex items-center gap-3 mb-6">
-        <Triangle size={16} className="text-neutral-muted rotate-180" />
+        <button
+          onClick={() => clearActiveCompany()}
+          className="p-1.5 rounded-lg text-neutral-muted hover:text-neutral-text hover:bg-neutral-bg border border-transparent hover:border-neutral-border transition-all duration-200"
+        >
+          <ArrowLeft size={16} />
+        </button>
         <div className="flex flex-col gap-1">
           <span className="text-xs text-neutral-muted">Empresa</span>
           <CompanySelector />
@@ -295,7 +316,6 @@ export default function FamilyOfficePage() {
           <button
             key={tab}
             onClick={() => {
-              setActiveTab(tab);
               const next = new URLSearchParams(searchParams);
               next.set('tab', tab);
               next.delete('action');
@@ -329,25 +349,33 @@ export default function FamilyOfficePage() {
       </div>
 
       {/* Tab Balances */}
-      {activeTab === 'balances' &&
-        (loadingBalances ? (
+      <div className={activeTab === 'balances' ? 'block' : 'hidden'}>
+        {loadingBalances ? (
           <div className="text-center py-12 text-neutral-muted text-sm animate-pulse">
             Cargando balances...
           </div>
         ) : visibleBalances.length === 0 ? (
-          <div className="bg-neutral-surface border border-neutral-border rounded-2xl p-8 text-center shadow-sm">
-            <FileSpreadsheet
-              size={32}
-              className="text-neutral-muted mx-auto mb-3"
-            />
-            <p className="text-sm font-medium text-neutral-text mb-1">
+          <div className="bg-neutral-surface border border-neutral-border rounded-2xl p-12 text-center shadow-sm">
+            <div className="w-14 h-14 rounded-2xl bg-neutral-bg border border-neutral-border flex items-center justify-center mx-auto mb-4">
+              <FileSpreadsheet size={24} className="text-neutral-muted" />
+            </div>
+            <p className="text-sm font-semibold text-neutral-text mb-1">
               No hay balances cargados
             </p>
-            <p className="text-xs text-neutral-muted">
+            <p className="text-xs text-neutral-muted mb-6">
               {activeCompany
                 ? `Sube el primer balance para ${activeCompany.name}`
                 : 'Selecciona una empresa y sube su primer balance'}
             </p>
+            {activeCompany && (
+              <button
+                onClick={() => setShowUploadModal(true)}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-hover transition-colors duration-200 shadow-md shadow-primary/20"
+              >
+                <Upload size={15} />
+                Subir primer balance
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4">
@@ -377,23 +405,22 @@ export default function FamilyOfficePage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <a
-                    href={balance.file_url}
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    onClick={() =>
+                      handleViewBalance(balance.id, balance.file_name)
+                    }
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-border text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200"
                   >
                     <Eye size={15} /> Ver datos
-                  </a>
-                  <a
-                    href={balance.file_url}
-                    download
+                  </button>
+                  <button
+                    onClick={() => downloadBalance(balance.id)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-border text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200"
                   >
                     <Download size={15} /> Exportar
-                  </a>
+                  </button>
                   <button
-                    onClick={() => handleDeleteBalance(balance.id)}
+                    onClick={() => setConfirmDeleteBalance(balance.id)}
                     className="p-1.5 rounded-lg border border-neutral-border text-red-400 hover:bg-red-50 transition-colors duration-200"
                   >
                     <Trash2 size={15} />
@@ -402,28 +429,42 @@ export default function FamilyOfficePage() {
               </div>
             ))}
           </div>
-        ))}
+        )}
+      </div>
 
       {/* Tab Vencimientos */}
-      {activeTab === 'vencimientos' &&
-        (loadingDeadlines ? (
+      <div className={activeTab === 'vencimientos' ? 'block' : 'hidden'}>
+        {loadingDeadlines ? (
           <div className="text-center py-12 text-neutral-muted text-sm animate-pulse">
             Cargando vencimientos...
           </div>
         ) : deadlines.length === 0 ? (
-          <div className="bg-neutral-surface border border-neutral-border rounded-2xl p-8 text-center shadow-sm">
-            <CalendarClock
-              size={32}
-              className="text-neutral-muted mx-auto mb-3"
-            />
-            <p className="text-sm font-medium text-neutral-text mb-1">
-              No hay obligaciones registradas
-            </p>
-            <p className="text-xs text-neutral-muted">
-              {activeCompany
-                ? `Crea la primera obligación para ${activeCompany.name}`
-                : 'Selecciona una empresa'}
-            </p>
+          <div className="bg-neutral-surface border border-neutral-border rounded-2xl p-12 text-center shadow-sm">
+            <div className="p-12 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-neutral-bg border border-neutral-border flex items-center justify-center mx-auto mb-4">
+                <CalendarClock size={24} className="text-neutral-muted" />
+              </div>
+              <p className="text-sm font-semibold text-neutral-text mb-1">
+                No hay obligaciones registradas
+              </p>
+              <p className="text-xs text-neutral-muted mb-6">
+                {activeCompany
+                  ? `Crea la primera obligación para ${activeCompany.name}`
+                  : 'Selecciona una empresa'}
+              </p>
+              {activeCompany && (
+                <button
+                  onClick={() => {
+                    setEditingDeadline(null);
+                    setShowDeadlineModal(true);
+                  }}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-hover transition-colors duration-200 shadow-md shadow-primary/20"
+                >
+                  <Plus size={15} />
+                  Nueva obligación
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <div className="bg-neutral-surface border border-neutral-border rounded-2xl shadow-sm overflow-hidden">
@@ -467,15 +508,17 @@ export default function FamilyOfficePage() {
               </tbody>
             </table>
           </div>
-        ))}
+        )}
+      </div>
+
       {/* Tab Cartera */}
-      {activeTab === 'cartera' && (
+      <div className={activeTab === 'cartera' ? 'block' : 'hidden'}>
         <div className="bg-neutral-surface border border-neutral-border rounded-2xl p-6 text-center text-neutral-muted text-sm shadow-sm">
           Módulo de cartera próximamente.
         </div>
-      )}
+      </div>
 
-      {/* Modales */}
+      {/* Modal subir balance */}
       {showUploadModal && (
         <UploadBalanceModal
           onClose={() => setShowUploadModal(false)}
@@ -486,17 +529,58 @@ export default function FamilyOfficePage() {
         />
       )}
 
-      {showDeadlineModal && (
+      {/* Modal crear/editar vencimiento */}
+      {isDeadlineModalVisible && (
         <DeadlineModal
           onClose={() => {
             setShowDeadlineModal(false);
             setEditingDeadline(null);
           }}
           onSuccess={handleDeadlineSuccess}
-          editing={editingDeadline}
+          editing={effectiveEditingDeadline}
         />
       )}
 
+      {/* Modal confirmar eliminar balance */}
+      {confirmDeleteBalance && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-neutral-surface border border-neutral-border rounded-2xl shadow-xl w-full max-w-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
+                <Trash2 size={18} className="text-red-400" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-neutral-text">
+                  Eliminar balance
+                </h3>
+                <p className="text-xs text-neutral-muted">
+                  Esta acción no se puede deshacer
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-neutral-text mb-6">
+              ¿Seguro que deseas eliminar este balance? El archivo también se
+              eliminará de la base de datos.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmDeleteBalance(null)}
+                className="flex-1 px-4 py-2 rounded-lg border border-neutral-border text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => handleDeleteBalance(confirmDeleteBalance)}
+                className="flex-1 px-4 py-2 rounded-lg bg-red-500 text-white text-sm hover:bg-red-600 transition-colors duration-200"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal confirmar eliminar vencimiento */}
       {confirmDeleteDeadline && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-neutral-surface border border-neutral-border rounded-2xl shadow-xl w-full max-w-sm p-6">
