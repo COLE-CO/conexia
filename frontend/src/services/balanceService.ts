@@ -41,3 +41,14 @@ export const uploadBalance = async (
 export const deleteBalance = async (balanceId: number): Promise<void> => {
   await api.delete(`/balances/${balanceId}`);
 };
+
+export const downloadBalance = async (balanceId: number): Promise<void> => {
+  const response = await api.get(`/balances/${balanceId}/download`);
+  const downloadUrl = response.data.download_url;
+  window.open(downloadUrl, '_blank');
+};
+
+export const viewBalance = async (balanceId: number): Promise<string> => {
+  const response = await api.get(`/balances/${balanceId}/download`);
+  return response.data.download_url;
+};

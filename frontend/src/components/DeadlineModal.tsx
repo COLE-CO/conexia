@@ -92,7 +92,7 @@ export default function DeadlineModal({ onClose, onSuccess, editing }: Props) {
         {/* Empresa */}
         {!editing && (
           <div className="mb-4 px-3 py-2 rounded-lg bg-neutral-bg border border-neutral-border text-sm text-neutral-text">
-            📁 {activeCompany?.name}
+             {activeCompany?.name}
           </div>
         )}
 
