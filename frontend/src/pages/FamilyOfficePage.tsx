@@ -35,16 +35,37 @@ import {
 } from 'lucide-react';
 
 const metrics = [
-  { label: 'Ingresos totales', value: '$ 0', icon: TrendingUp, color: 'bg-primary text-white' },
-  { label: 'Gastos totales', value: '$ 0', icon: TrendingDown, color: 'bg-danger/15 text-danger' },
-  { label: 'Utilidad neta', value: '$ 0', icon: DollarSign, color: 'bg-secondary/15 text-secondary' },
-  { label: 'Cartera por cobrar', value: '$ 0', icon: Users, color: 'bg-primary/10 text-primary' },
+  {
+    label: 'Ingresos totales',
+    value: '$ 0',
+    icon: TrendingUp,
+    color: 'bg-primary text-white',
+  },
+  {
+    label: 'Gastos totales',
+    value: '$ 0',
+    icon: TrendingDown,
+    color: 'bg-danger/15 text-danger',
+  },
+  {
+    label: 'Utilidad neta',
+    value: '$ 0',
+    icon: DollarSign,
+    color: 'bg-secondary/15 text-secondary',
+  },
+  {
+    label: 'Cartera por cobrar',
+    value: '$ 0',
+    icon: Users,
+    color: 'bg-primary/10 text-primary',
+  },
 ];
 
 type Tab = 'balances' | 'vencimientos' | 'cartera';
 
 const getTabFromParam = (value: string | null): Tab | null => {
-  if (value === 'balances' || value === 'vencimientos' || value === 'cartera') return value;
+  if (value === 'balances' || value === 'vencimientos' || value === 'cartera')
+    return value;
   return null;
 };
 
@@ -59,25 +80,36 @@ export default function FamilyOfficePage() {
   const [balances, setBalances] = useState<Balance[]>([]);
   const [loadedCompanyId, setLoadedCompanyId] = useState<number | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [confirmDeleteBalance, setConfirmDeleteBalance] = useState<number | null>(null);
+  const [confirmDeleteBalance, setConfirmDeleteBalance] = useState<
+    number | null
+  >(null);
 
   // Vencimientos
   const [deadlines, setDeadlines] = useState<Deadline[]>([]);
   const [loadingDeadlines, setLoadingDeadlines] = useState(false);
   const [showDeadlineModal, setShowDeadlineModal] = useState(false);
   const [editingDeadline, setEditingDeadline] = useState<Deadline | null>(null);
-  const [confirmDeleteDeadline, setConfirmDeleteDeadline] = useState<number | null>(null);
+  const [confirmDeleteDeadline, setConfirmDeleteDeadline] = useState<
+    number | null
+  >(null);
 
-  const loadingBalances = !!activeCompany && loadedCompanyId !== activeCompany.id;
+  const loadingBalances =
+    !!activeCompany && loadedCompanyId !== activeCompany.id;
   const visibleBalances = activeCompany ? balances : [];
 
   const sortDeadlines = (list: Deadline[]) => {
     const pendientes = list
       .filter((d) => d.status === 'pendiente')
-      .sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime());
+      .sort(
+        (a, b) =>
+          new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+      );
     const cumplidos = list
       .filter((d) => d.status === 'cumplido')
-      .sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime());
+      .sort(
+        (a, b) =>
+          new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+      );
     return [...pendientes, ...cumplidos];
   };
 
@@ -87,7 +119,9 @@ export default function FamilyOfficePage() {
     !!activeCompany;
 
   const isDeadlineModalVisible = showDeadlineModal || hasNewObligationAction;
-  const effectiveEditingDeadline = hasNewObligationAction ? null : editingDeadline;
+  const effectiveEditingDeadline = hasNewObligationAction
+    ? null
+    : editingDeadline;
 
   useEffect(() => {
     if (!hasNewObligationAction) return;
@@ -104,11 +138,19 @@ export default function FamilyOfficePage() {
     let cancelled = false;
 
     getBalancesByCompany(currentCompanyId)
-      .then((data) => { if (!cancelled) setBalances(data); })
-      .catch(() => { if (!cancelled) setBalances([]); })
-      .finally(() => { if (!cancelled) setLoadedCompanyId(currentCompanyId); });
+      .then((data) => {
+        if (!cancelled) setBalances(data);
+      })
+      .catch(() => {
+        if (!cancelled) setBalances([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadedCompanyId(currentCompanyId);
+      });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [activeCompany]);
 
   // Cargar vencimientos
@@ -137,7 +179,9 @@ export default function FamilyOfficePage() {
 
     void loadDeadlines();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [activeCompany]);
 
   const handleDeleteBalance = async (balanceId: number) => {
@@ -173,7 +217,9 @@ export default function FamilyOfficePage() {
 
   const handleDeadlineSuccess = (deadline: Deadline) => {
     if (editingDeadline) {
-      setDeadlines((prev) => sortDeadlines(prev.map((d) => (d.id === deadline.id ? deadline : d))));
+      setDeadlines((prev) =>
+        sortDeadlines(prev.map((d) => (d.id === deadline.id ? deadline : d)))
+      );
     } else {
       setDeadlines((prev) => sortDeadlines([...prev, deadline]));
     }
@@ -193,9 +239,12 @@ export default function FamilyOfficePage() {
       {/* Header */}
       <div className="relative flex items-start justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-text font-hubot tracking-tight">Family Office</h1>
+          <h1 className="text-3xl font-bold text-neutral-text font-hubot tracking-tight">
+            Family Office
+          </h1>
           <p className="text-sm text-neutral-muted mt-1">
-            Balances generales, reportes con IA, vencimientos y cartera de clientes.
+            Balances generales, reportes con IA, vencimientos y cartera de
+            clientes.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -214,7 +263,10 @@ export default function FamilyOfficePage() {
           </div>
           <div className={activeTab === 'vencimientos' ? 'block' : 'hidden'}>
             <button
-              onClick={() => { setEditingDeadline(null); setShowDeadlineModal(true); }}
+              onClick={() => {
+                setEditingDeadline(null);
+                setShowDeadlineModal(true);
+              }}
               className="flex items-center justify-center gap-2 min-w-[180px] px-4 py-2 rounded-lg bg-primary text-white text-sm ..."
             >
               <Plus size={16} />
@@ -241,8 +293,13 @@ export default function FamilyOfficePage() {
       {/* Métricas */}
       <div className="relative z-10 grid grid-cols-4 gap-4 mb-6">
         {metrics.map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="bg-neutral-surface border border-neutral-border rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow duration-200">
-            <div className={`${color} rounded-xl w-11 h-11 flex items-center justify-center flex-shrink-0`}>
+          <div
+            key={label}
+            className="bg-neutral-surface border border-neutral-border rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow duration-200"
+          >
+            <div
+              className={`${color} rounded-xl w-11 h-11 flex items-center justify-center flex-shrink-0`}
+            >
               <Icon size={20} />
             </div>
             <div>
@@ -265,14 +322,28 @@ export default function FamilyOfficePage() {
               setSearchParams(next, { replace: true });
             }}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium capitalize transition-all duration-200
-              ${activeTab === tab
-                ? 'bg-neutral-bg text-neutral-text border border-neutral-border shadow-sm'
-                : 'text-neutral-muted hover:text-neutral-text hover:bg-neutral-bg/60'}
+              ${
+                activeTab === tab
+                  ? 'bg-neutral-bg text-neutral-text border border-neutral-border shadow-sm'
+                  : 'text-neutral-muted hover:text-neutral-text hover:bg-neutral-bg/60'
+              }
             `}
           >
-            {tab === 'balances' && <span className="inline-flex items-center gap-1.5"><FileSpreadsheet size={15} /> Balances</span>}
-            {tab === 'vencimientos' && <span className="inline-flex items-center gap-1.5"><CalendarClock size={15} /> Vencimientos</span>}
-            {tab === 'cartera' && <span className="inline-flex items-center gap-1.5"><Users size={15} /> Cartera</span>}
+            {tab === 'balances' && (
+              <span className="inline-flex items-center gap-1.5">
+                <FileSpreadsheet size={15} /> Balances
+              </span>
+            )}
+            {tab === 'vencimientos' && (
+              <span className="inline-flex items-center gap-1.5">
+                <CalendarClock size={15} /> Vencimientos
+              </span>
+            )}
+            {tab === 'cartera' && (
+              <span className="inline-flex items-center gap-1.5">
+                <Users size={15} /> Cartera
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -280,15 +351,21 @@ export default function FamilyOfficePage() {
       {/* Tab Balances */}
       <div className={activeTab === 'balances' ? 'block' : 'hidden'}>
         {loadingBalances ? (
-          <div className="text-center py-12 text-neutral-muted text-sm animate-pulse">Cargando balances...</div>
+          <div className="text-center py-12 text-neutral-muted text-sm animate-pulse">
+            Cargando balances...
+          </div>
         ) : visibleBalances.length === 0 ? (
           <div className="bg-neutral-surface border border-neutral-border rounded-2xl p-12 text-center shadow-sm">
             <div className="w-14 h-14 rounded-2xl bg-neutral-bg border border-neutral-border flex items-center justify-center mx-auto mb-4">
               <FileSpreadsheet size={24} className="text-neutral-muted" />
             </div>
-            <p className="text-sm font-semibold text-neutral-text mb-1">No hay balances cargados</p>
+            <p className="text-sm font-semibold text-neutral-text mb-1">
+              No hay balances cargados
+            </p>
             <p className="text-xs text-neutral-muted mb-6">
-              {activeCompany ? `Sube el primer balance para ${activeCompany.name}` : 'Selecciona una empresa y sube su primer balance'}
+              {activeCompany
+                ? `Sube el primer balance para ${activeCompany.name}`
+                : 'Selecciona una empresa y sube su primer balance'}
             </p>
             {activeCompany && (
               <button
@@ -303,24 +380,35 @@ export default function FamilyOfficePage() {
         ) : (
           <div className="grid grid-cols-2 gap-4">
             {visibleBalances.map((balance) => (
-              <div key={balance.id} className="bg-neutral-surface border border-neutral-border rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+              <div
+                key={balance.id}
+                className="bg-neutral-surface border border-neutral-border rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200"
+              >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="bg-neutral-bg border border-neutral-border rounded-lg w-10 h-10 flex items-center justify-center">
-                      <FileSpreadsheet size={18} className="text-neutral-muted" />
+                      <FileSpreadsheet
+                        size={18}
+                        className="text-neutral-muted"
+                      />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-neutral-text">{balance.file_name}</p>
+                      <p className="text-sm font-semibold text-neutral-text">
+                        {balance.file_name}
+                      </p>
                       <p className="text-xs text-neutral-muted">
                         {activeCompany?.name} · {balance.year}
-                        {balance.month ? `/${balance.month}` : ''} · Subido {String(balance.uploaded_at).slice(0, 10)}
+                        {balance.month ? `/${balance.month}` : ''} · Subido{' '}
+                        {String(balance.uploaded_at).slice(0, 10)}
                       </p>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => handleViewBalance(balance.id, balance.file_name)}
+                    onClick={() =>
+                      handleViewBalance(balance.id, balance.file_name)
+                    }
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-border text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200"
                   >
                     <Eye size={15} /> Ver datos
@@ -347,20 +435,29 @@ export default function FamilyOfficePage() {
       {/* Tab Vencimientos */}
       <div className={activeTab === 'vencimientos' ? 'block' : 'hidden'}>
         {loadingDeadlines ? (
-          <div className="text-center py-12 text-neutral-muted text-sm animate-pulse">Cargando vencimientos...</div>
+          <div className="text-center py-12 text-neutral-muted text-sm animate-pulse">
+            Cargando vencimientos...
+          </div>
         ) : deadlines.length === 0 ? (
           <div className="bg-neutral-surface border border-neutral-border rounded-2xl p-12 text-center shadow-sm">
             <div className="p-12 text-center">
               <div className="w-14 h-14 rounded-2xl bg-neutral-bg border border-neutral-border flex items-center justify-center mx-auto mb-4">
                 <CalendarClock size={24} className="text-neutral-muted" />
               </div>
-              <p className="text-sm font-semibold text-neutral-text mb-1">No hay obligaciones registradas</p>
+              <p className="text-sm font-semibold text-neutral-text mb-1">
+                No hay obligaciones registradas
+              </p>
               <p className="text-xs text-neutral-muted mb-6">
-                {activeCompany ? `Crea la primera obligación para ${activeCompany.name}` : 'Selecciona una empresa'}
+                {activeCompany
+                  ? `Crea la primera obligación para ${activeCompany.name}`
+                  : 'Selecciona una empresa'}
               </p>
               {activeCompany && (
                 <button
-                  onClick={() => { setEditingDeadline(null); setShowDeadlineModal(true); }}
+                  onClick={() => {
+                    setEditingDeadline(null);
+                    setShowDeadlineModal(true);
+                  }}
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-hover transition-colors duration-200 shadow-md shadow-primary/20"
                 >
                   <Plus size={15} />
@@ -372,15 +469,25 @@ export default function FamilyOfficePage() {
         ) : (
           <div className="bg-neutral-surface border border-neutral-border rounded-2xl shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-neutral-border">
-              <h2 className="text-sm font-bold text-neutral-text">Obligaciones fiscales y vencimientos</h2>
+              <h2 className="text-sm font-bold text-neutral-text">
+                Obligaciones fiscales y vencimientos
+              </h2>
             </div>
             <table className="w-full">
               <thead>
                 <tr className="border-b border-neutral-border">
-                  <th className="py-3 px-4 text-xs text-neutral-muted font-medium text-left">Obligación</th>
-                  <th className="py-3 px-4 text-xs text-neutral-muted font-medium text-left">Empresa</th>
-                  <th className="py-3 px-4 text-xs text-neutral-muted font-medium text-left">Vencimiento</th>
-                  <th className="py-3 px-4 text-xs text-neutral-muted font-medium text-left">Estado</th>
+                  <th className="py-3 px-4 text-xs text-neutral-muted font-medium text-left">
+                    Obligación
+                  </th>
+                  <th className="py-3 px-4 text-xs text-neutral-muted font-medium text-left">
+                    Empresa
+                  </th>
+                  <th className="py-3 px-4 text-xs text-neutral-muted font-medium text-left">
+                    Vencimiento
+                  </th>
+                  <th className="py-3 px-4 text-xs text-neutral-muted font-medium text-left">
+                    Estado
+                  </th>
                   <th className="py-3 px-4 text-xs text-neutral-muted font-medium text-left"></th>
                 </tr>
               </thead>
@@ -391,7 +498,10 @@ export default function FamilyOfficePage() {
                     deadline={deadline}
                     companyName={activeCompany?.name}
                     onConfirm={handleConfirmDeadline}
-                    onEdit={(d) => { setEditingDeadline(d); setShowDeadlineModal(true); }}
+                    onEdit={(d) => {
+                      setEditingDeadline(d);
+                      setShowDeadlineModal(true);
+                    }}
                     onDelete={(id) => setConfirmDeleteDeadline(id)}
                   />
                 ))}
@@ -422,7 +532,10 @@ export default function FamilyOfficePage() {
       {/* Modal crear/editar vencimiento */}
       {isDeadlineModalVisible && (
         <DeadlineModal
-          onClose={() => { setShowDeadlineModal(false); setEditingDeadline(null); }}
+          onClose={() => {
+            setShowDeadlineModal(false);
+            setEditingDeadline(null);
+          }}
           onSuccess={handleDeadlineSuccess}
           editing={effectiveEditingDeadline}
         />
@@ -437,12 +550,17 @@ export default function FamilyOfficePage() {
                 <Trash2 size={18} className="text-red-400" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-neutral-text">Eliminar balance</h3>
-                <p className="text-xs text-neutral-muted">Esta acción no se puede deshacer</p>
+                <h3 className="text-base font-bold text-neutral-text">
+                  Eliminar balance
+                </h3>
+                <p className="text-xs text-neutral-muted">
+                  Esta acción no se puede deshacer
+                </p>
               </div>
             </div>
             <p className="text-sm text-neutral-text mb-6">
-              ¿Seguro que deseas eliminar este balance? El archivo también se eliminará de la base de datos.
+              ¿Seguro que deseas eliminar este balance? El archivo también se
+              eliminará de la base de datos.
             </p>
             <div className="flex gap-3">
               <button
@@ -471,8 +589,12 @@ export default function FamilyOfficePage() {
                 <Trash2 size={18} className="text-red-400" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-neutral-text">Eliminar obligación</h3>
-                <p className="text-xs text-neutral-muted">Esta acción no se puede deshacer</p>
+                <h3 className="text-base font-bold text-neutral-text">
+                  Eliminar obligación
+                </h3>
+                <p className="text-xs text-neutral-muted">
+                  Esta acción no se puede deshacer
+                </p>
               </div>
             </div>
             <p className="text-sm text-neutral-text mb-6">
