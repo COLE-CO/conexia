@@ -67,10 +67,14 @@ const LoginPage = () => {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-neutral-text mb-1">
+                <label
+                  htmlFor="login-email"
+                  className="block text-sm font-medium text-neutral-text mb-1"
+                >
                   Correo Electrónico
                 </label>
                 <input
+                  id="login-email"
                   type="email"
                   required
                   className="w-full px-4 py-3 border border-neutral-border rounded-lg bg-neutral-bg focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition-colors duration-200"
@@ -80,10 +84,14 @@ const LoginPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-neutral-text mb-1">
+                <label
+                  htmlFor="login-password"
+                  className="block text-sm font-medium text-neutral-text mb-1"
+                >
                   Contraseña
                 </label>
                 <input
+                  id="login-password"
                   type="password"
                   required
                   className="w-full px-4 py-3 border border-neutral-border rounded-lg bg-neutral-bg focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary transition-colors duration-200"
