@@ -206,7 +206,7 @@ export default function FamilyOfficePage() {
           <div className={activeTab === 'balances' ? 'block' : 'hidden'}>
             <button
               onClick={() => setShowUploadModal(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm hover:bg-primary-hover transition-colors duration-200 shadow-md"
+              className="flex items-center justify-center gap-2 min-w-[180px] px-4 py-2 rounded-lg bg-primary text-white text-sm ..."
             >
               <Upload size={16} />
               Subir balance
@@ -215,7 +215,7 @@ export default function FamilyOfficePage() {
           <div className={activeTab === 'vencimientos' ? 'block' : 'hidden'}>
             <button
               onClick={() => { setEditingDeadline(null); setShowDeadlineModal(true); }}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm hover:bg-primary-hover transition-colors duration-200 shadow-md"
+              className="flex items-center justify-center gap-2 min-w-[180px] px-4 py-2 rounded-lg bg-primary text-white text-sm ..."
             >
               <Plus size={16} />
               Nueva obligación
