@@ -81,17 +81,21 @@ export default function FamilyOfficePage() {
     return [...pendientes, ...cumplidos];
   };
 
-  // Solo este effect, sin setActiveTab
+  const hasNewObligationAction =
+    searchParams.get('action') === 'new-obligation' &&
+    activeTab === 'vencimientos' &&
+    !!activeCompany;
+
+  const isDeadlineModalVisible = showDeadlineModal || hasNewObligationAction;
+  const effectiveEditingDeadline = hasNewObligationAction ? null : editingDeadline;
+
   useEffect(() => {
-    const action = searchParams.get('action');
-    if (action === 'new-obligation' && activeTab === 'vencimientos' && activeCompany) {
-      setEditingDeadline(null);
-      setShowDeadlineModal(true);
-      const next = new URLSearchParams(searchParams);
-      next.delete('action');
-      setSearchParams(next, { replace: true });
-    }
-  }, [searchParams, activeTab, activeCompany, setSearchParams]);
+    if (!hasNewObligationAction) return;
+
+    const next = new URLSearchParams(searchParams);
+    next.delete('action');
+    setSearchParams(next, { replace: true });
+  }, [hasNewObligationAction, searchParams, setSearchParams]);
 
   // Cargar balances
   useEffect(() => {
@@ -111,12 +115,27 @@ export default function FamilyOfficePage() {
   useEffect(() => {
     if (!activeCompany) return;
     let cancelled = false;
-    setLoadingDeadlines(true);
 
-    getDeadlinesByCompany(activeCompany.id)
-      .then((data) => { if (!cancelled) setDeadlines(sortDeadlines(data)); })
-      .catch(() => { if (!cancelled) setDeadlines([]); })
-      .finally(() => { if (!cancelled) setLoadingDeadlines(false); });
+    const loadDeadlines = async () => {
+      setLoadingDeadlines(true);
+
+      try {
+        const data = await getDeadlinesByCompany(activeCompany.id);
+        if (!cancelled) {
+          setDeadlines(sortDeadlines(data));
+        }
+      } catch {
+        if (!cancelled) {
+          setDeadlines([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingDeadlines(false);
+        }
+      }
+    };
+
+    void loadDeadlines();
 
     return () => { cancelled = true; };
   }, [activeCompany]);
@@ -401,11 +420,11 @@ export default function FamilyOfficePage() {
       )}
 
       {/* Modal crear/editar vencimiento */}
-      {showDeadlineModal && (
+      {isDeadlineModalVisible && (
         <DeadlineModal
           onClose={() => { setShowDeadlineModal(false); setEditingDeadline(null); }}
           onSuccess={handleDeadlineSuccess}
-          editing={editingDeadline}
+          editing={effectiveEditingDeadline}
         />
       )}
 
