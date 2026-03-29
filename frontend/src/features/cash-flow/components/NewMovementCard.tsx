@@ -131,7 +131,7 @@ export default function NewMovementCard({
 
         <button
           disabled={!canSaveMovement || movementSaving}
-          className="rounded-lg bg-primary text-white text-sm px-4 py-2.5 min-w-[170px] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="block w-full md:w-[320px] mx-auto rounded-lg bg-primary text-white text-sm px-4 py-2.5 disabled:bg-primary disabled:opacity-100 disabled:cursor-not-allowed"
         >
           <span className="inline-flex items-center justify-center w-full">
             {movementSaving ? 'Guardando...' : 'Guardar movimiento'}

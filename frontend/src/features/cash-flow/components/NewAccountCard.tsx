@@ -76,7 +76,7 @@ export default function NewAccountCard({
 
         <button
           disabled={!canSaveAccount || accountSaving}
-          className="w-full rounded-lg bg-primary text-white text-sm py-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full rounded-lg bg-primary text-white text-sm py-2.5 disabled:bg-primary disabled:opacity-100 disabled:cursor-not-allowed"
         >
           <span className="inline-flex items-center justify-center min-w-[120px]">
             {accountSaving ? 'Guardando...' : 'Crear cuenta'}
