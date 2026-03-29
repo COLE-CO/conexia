@@ -64,7 +64,8 @@ export function useCashFlowData() {
   const [accountError, setAccountError] = useState<string | null>(null);
   const [movementSaving, setMovementSaving] = useState(false);
   const [accountSaving, setAccountSaving] = useState(false);
-  const [filters, setFilters] = useState<CashFlowFiltersState>(initialFiltersState);
+  const [filters, setFilters] =
+    useState<CashFlowFiltersState>(initialFiltersState);
   const [debouncedSearch, setDebouncedSearch] = useState(filters.search);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
@@ -96,7 +97,9 @@ export function useCashFlowData() {
         }
       } catch {
         if (!cancelled) {
-          setMovementError('No fue posible cargar la información del flujo de caja.');
+          setMovementError(
+            'No fue posible cargar la información del flujo de caja.'
+          );
           showToast('error', 'No fue posible cargar flujo de caja.');
         }
       } finally {
@@ -234,7 +237,9 @@ export function useCashFlowData() {
     event.preventDefault();
 
     if (!canSaveMovement) {
-      setMovementError('Completa todos los campos obligatorios del movimiento.');
+      setMovementError(
+        'Completa todos los campos obligatorios del movimiento.'
+      );
       return;
     }
 
@@ -258,10 +263,7 @@ export function useCashFlowData() {
         ...initialMovementForm,
         movement_type: prev.movement_type as CashMovementType,
       }));
-      showToast(
-        'success',
-        `Movimiento registrado en ${created.account_name}.`
-      );
+      showToast('success', `Movimiento registrado en ${created.account_name}.`);
     } catch (error: unknown) {
       const detail = getApiDetail(error);
       setMovementError(detail || 'No se pudo registrar el movimiento.');

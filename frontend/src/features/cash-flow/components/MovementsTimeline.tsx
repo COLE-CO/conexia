@@ -1,6 +1,9 @@
 import { ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 
-import type { CashAccount, CashMovement } from '../../../services/cashFlowService';
+import type {
+  CashAccount,
+  CashMovement,
+} from '../../../services/cashFlowService';
 import { currency } from '../types';
 import type { CashFlowFiltersState } from '../types';
 
@@ -125,9 +128,15 @@ export default function MovementsTimeline({
                       <td className="px-4 py-3 align-top">
                         <div className="flex items-start gap-2">
                           {isIncome ? (
-                            <ArrowUpCircle size={15} className="text-emerald-600 mt-0.5" />
+                            <ArrowUpCircle
+                              size={15}
+                              className="text-emerald-600 mt-0.5"
+                            />
                           ) : (
-                            <ArrowDownCircle size={15} className="text-danger mt-0.5" />
+                            <ArrowDownCircle
+                              size={15}
+                              className="text-danger mt-0.5"
+                            />
                           )}
                           <div>
                             <p className="font-medium text-neutral-text leading-5">
@@ -145,7 +154,9 @@ export default function MovementsTimeline({
                       </td>
 
                       <td className="px-4 py-3 text-neutral-text align-top">
-                        {new Date(movement.movement_date).toLocaleDateString('es-CO')}
+                        {new Date(movement.movement_date).toLocaleDateString(
+                          'es-CO'
+                        )}
                       </td>
 
                       <td className="px-4 py-3 align-top">

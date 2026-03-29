@@ -9,7 +9,10 @@ interface CashFlowToastsProps {
   onDismiss: (id: number) => void;
 }
 
-export default function CashFlowToasts({ toasts, onDismiss }: CashFlowToastsProps) {
+export default function CashFlowToasts({
+  toasts,
+  onDismiss,
+}: CashFlowToastsProps) {
   if (toasts.length === 0) return null;
 
   return (

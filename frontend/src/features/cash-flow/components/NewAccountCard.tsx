@@ -29,7 +29,9 @@ export default function NewAccountCard({
 
       <form className="space-y-3" onSubmit={onSubmit}>
         <div>
-          <label className="text-xs text-neutral-muted">Nombre de cuenta *</label>
+          <label className="text-xs text-neutral-muted">
+            Nombre de cuenta *
+          </label>
           <input
             value={accountForm.name}
             onChange={(event) =>
