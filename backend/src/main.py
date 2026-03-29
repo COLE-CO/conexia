@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.modules.auth.router import router as auth_router
+from src.modules.cole_co.cash_flow.router import router as cash_flow_router
 from src.modules.family_office.balances.router import router as balances_router
 from src.modules.family_office.companies.router import router as companies_router
 from src.modules.family_office.deadlines.router import router as deadlines_router
@@ -19,6 +20,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(cash_flow_router)
 app.include_router(companies_router)
 app.include_router(balances_router)
 app.include_router(deadlines_router)

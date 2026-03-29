@@ -25,6 +25,7 @@ from src.modules.auth import models
 from src.modules.family_office.companies import models as company_models
 from src.modules.family_office.balances import models as balance_models
 from src.modules.family_office.deadlines import models as deadline_models
+from src.modules.cole_co.cash_flow import models as cash_flow_models
 # =================================================================
 
 
@@ -90,9 +91,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
