@@ -6,6 +6,7 @@ from src.modules.cole_co.cash_flow.router import router as cash_flow_router
 from src.modules.family_office.balances.router import router as balances_router
 from src.modules.family_office.companies.router import router as companies_router
 from src.modules.family_office.deadlines.router import router as deadlines_router
+from src.modules.family_office.reports.router import router as reports_router
 
 app = FastAPI(title="Conexia API")
 
@@ -24,6 +25,7 @@ app.include_router(cash_flow_router)
 app.include_router(companies_router)
 app.include_router(balances_router)
 app.include_router(deadlines_router)
+app.include_router(reports_router)
 
 
 @app.get("/")
