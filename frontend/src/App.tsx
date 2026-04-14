@@ -10,6 +10,7 @@ import FamilyOfficePage from './pages/FamilyOfficePage';
 import React from 'react';
 import SettingsPage from './pages/SettingsPage';
 import NotificationsPage from './pages/NotificationsPage';
+import CashFlowPage from './pages/CashFlowPage';
 
 function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   return (
@@ -65,7 +66,7 @@ function App() {
           element={
             <ProtectedRoute>
               <LayoutWithSidebar>
-                <h1 className="p-6">Flujo de Caja</h1>
+                <CashFlowPage />
               </LayoutWithSidebar>
             </ProtectedRoute>
           }
