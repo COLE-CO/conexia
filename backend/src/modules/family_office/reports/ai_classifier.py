@@ -4,6 +4,8 @@ from openai import OpenAI
 
 from src.core.config import settings
 
+client = OpenAI(api_key=settings.OPENAI_API_KEY)
+
 SYSTEM_PROMPT = (
     "Eres un asistente contable colombiano experto. "
     "Recibes datos crudos extraídos de un balance financiero "
@@ -37,8 +39,6 @@ SYSTEM_PROMPT = (
 
 
 def classify_balance(extracted_text: str, company_name: str, period: str) -> dict:
-    client = OpenAI(api_key=settings.OPENAI_API_KEY)
-
     user_message = (
         f"Empresa: {company_name}\n"
         f"Período: {period}\n\n"
