@@ -204,9 +204,7 @@ def _compute_month_totals(
 
 def get_monthly_summary(db: Session, account_id: int, year: int, month: int):
     account = (
-        db.query(models.CashAccount)
-        .filter(models.CashAccount.id == account_id)
-        .first()
+        db.query(models.CashAccount).filter(models.CashAccount.id == account_id).first()
     )
     if not account:
         raise HTTPException(
