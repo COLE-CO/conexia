@@ -315,9 +315,10 @@ def close_month(db: Session, account_id: int, year: int, month: int, user_id: in
                 .first()
             )
             if not prev_closing:
+                prev_label = f"{prev_month:02d}/{prev_year}"
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Debe cerrar el mes anterior ({prev_month:02d}/{prev_year}) primero",
+                    detail=f"Debe cerrar el mes anterior ({prev_label}) primero",
                 )
 
     opening = _compute_opening_balance(db, account, year, month)
