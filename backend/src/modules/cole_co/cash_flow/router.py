@@ -55,3 +55,44 @@ def create_cash_movement(
     current_user=Depends(auth_dependencies.require_role(ALLOWED_ROLES)),
 ):
     return service.create_movement(db, payload)
+
+
+@router.get(
+    "/monthly-summary",
+    response_model=schemas.MonthlySummaryResponse,
+)
+def get_monthly_summary(
+    account_id: int,
+    year: int,
+    month: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(auth_dependencies.require_role(ALLOWED_ROLES)),
+):
+    return service.get_monthly_summary(db, account_id, year, month)
+
+
+@router.post(
+    "/monthly-close",
+    response_model=schemas.MonthlyClosingResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def close_month(
+    payload: schemas.MonthlyCloseRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(auth_dependencies.require_role(ALLOWED_ROLES)),
+):
+    return service.close_month(
+        db, payload.account_id, payload.year, payload.month, current_user.id
+    )
+
+
+@router.get(
+    "/monthly-closings",
+    response_model=list[schemas.MonthlyClosingResponse],
+)
+def get_monthly_closings(
+    account_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(auth_dependencies.require_role(ALLOWED_ROLES)),
+):
+    return service.list_closings(db, account_id)
