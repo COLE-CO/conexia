@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -22,16 +21,17 @@ class Settings(BaseSettings):
     ADMIN_PASSWORD: str
 
     # OpenAI
-    OPENAI_API_KEY: str
+    OPENAI_API_KEY: str | None = None
 
     # S3
     AWS_ACCESS_KEY_ID: str
     AWS_SECRET_ACCESS_KEY: str
-    AWS_SESSION_TOKEN: Optional[str] = None
+    AWS_SESSION_TOKEN: str | None = None
     AWS_REGION: str
     AWS_BUCKET_NAME: str
 
     # Email
     RESEND_API_KEY: str
+
 
 settings = Settings()

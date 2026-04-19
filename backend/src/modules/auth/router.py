@@ -112,8 +112,11 @@ def update_my_profile(
             detail="El inicio del rango no puede ser mayor al fin del rango",
         )
 
-    if current_user.role != models.UserRole.ADMIN:
-        profile_data.reminder_window_start_days = current_user.reminder_window_start_days
+    user_role = getattr(current_user, "role", None)
+    if user_role is not None and user_role != models.UserRole.ADMIN:
+        profile_data.reminder_window_start_days = (
+            current_user.reminder_window_start_days
+        )
         profile_data.reminder_window_end_days = current_user.reminder_window_end_days
 
     return service.update_user_profile(db, current_user, profile_data)
