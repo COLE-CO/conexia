@@ -170,18 +170,15 @@ export const useNotifications = ({
     [notifications]
   );
 
-  const markAsRead = useCallback(
-    (notificationId: string) => {
-      setReadIds((currentIds) => {
-        if (currentIds.includes(notificationId)) {
-          return currentIds;
-        }
+  const markAsRead = useCallback((notificationId: string) => {
+    setReadIds((currentIds) => {
+      if (currentIds.includes(notificationId)) {
+        return currentIds;
+      }
 
-        return [...currentIds, notificationId];
-      });
-    },
-    []
-  );
+      return [...currentIds, notificationId];
+    });
+  }, []);
 
   const retry = useCallback(() => {
     setReloadKey((current) => current + 1);

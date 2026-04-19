@@ -48,7 +48,8 @@ export default function NotificationsPage() {
 
   const hasNotificationsAccess =
     !!user?.role && NOTIFICATIONS_ALLOWED_ROLES.includes(user.role);
-  const hasEnabledAlerts = hasNotificationsAccess && !!user?.alert_deadlines_enabled;
+  const hasEnabledAlerts =
+    hasNotificationsAccess && !!user?.alert_deadlines_enabled;
 
   useEffect(() => {
     if (!hasEnabledAlerts) {
@@ -179,22 +180,23 @@ export default function NotificationsPage() {
                 Sin acceso al centro de notificaciones
               </h2>
               <p className="mt-2 text-sm text-neutral-muted">
-                Este modulo esta disponible solo para admin y contador family office.
+                Este modulo esta disponible solo para admin y contador family
+                office.
               </p>
             </div>
           ) : (
-          <div className="rounded-3xl border border-dashed border-neutral-border bg-neutral-surface p-10 text-center shadow-sm">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-bg text-neutral-muted">
-              <BellOff size={22} />
+            <div className="rounded-3xl border border-dashed border-neutral-border bg-neutral-surface p-10 text-center shadow-sm">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-bg text-neutral-muted">
+                <BellOff size={22} />
+              </div>
+              <h2 className="text-lg font-bold text-neutral-text">
+                No hay alertas activas
+              </h2>
+              <p className="mt-2 text-sm text-neutral-muted">
+                Activa uno o más tipos de alertas desde Ajustes para volver a
+                ver este módulo.
+              </p>
             </div>
-            <h2 className="text-lg font-bold text-neutral-text">
-              No hay alertas activas
-            </h2>
-            <p className="mt-2 text-sm text-neutral-muted">
-              Activa uno o más tipos de alertas desde Ajustes para volver a ver
-              este módulo.
-            </p>
-          </div>
           )
         ) : isInitiallyLoading ? (
           <NotificationsPageSkeleton />
