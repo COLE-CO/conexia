@@ -31,6 +31,8 @@ class UserResponse(UserBase):
     alert_deadlines_enabled: bool
     alert_balances_enabled: bool
     alert_reports_enabled: bool
+    reminder_window_start_days: int
+    reminder_window_end_days: int
 
     class Config:
         from_attributes = True
@@ -46,3 +48,5 @@ class UserProfileUpdate(BaseModel):
     alert_deadlines_enabled: bool
     alert_balances_enabled: bool
     alert_reports_enabled: bool
+    reminder_window_start_days: int = 5
+    reminder_window_end_days: int = 7

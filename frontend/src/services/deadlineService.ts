@@ -8,6 +8,9 @@ export interface Deadline {
   name: string;
   description?: string;
   due_date: string;
+  client_email: string;
+  amount?: string;
+  reminder_sent_at?: string;
   status: DeadlineStatus;
 }
 
@@ -16,12 +19,16 @@ export interface CreateDeadline {
   name: string;
   description?: string;
   due_date: string;
+  client_email: string;
+  amount?: string;
 }
 
 export interface UpdateDeadline {
   name?: string;
   description?: string;
   due_date?: string;
+  client_email?: string;
+  amount?: string;
 }
 
 export const getDeadlinesByCompany = async (

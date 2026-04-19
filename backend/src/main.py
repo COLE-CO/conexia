@@ -7,6 +7,7 @@ from src.modules.family_office.balances.router import router as balances_router
 from src.modules.family_office.companies.router import router as companies_router
 from src.modules.family_office.deadlines.router import router as deadlines_router
 from src.modules.family_office.reports.router import router as reports_router
+from src.scheduler import start_scheduler, stop_scheduler
 
 app = FastAPI(title="Conexia API")
 
@@ -26,6 +27,16 @@ app.include_router(companies_router)
 app.include_router(balances_router)
 app.include_router(deadlines_router)
 app.include_router(reports_router)
+
+
+@app.on_event("startup")
+def startup_event():
+    start_scheduler()
+
+
+@app.on_event("shutdown")
+def shutdown_event():
+    stop_scheduler()
 
 
 @app.get("/")

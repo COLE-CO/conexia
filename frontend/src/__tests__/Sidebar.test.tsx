@@ -16,6 +16,8 @@ const baseUser: UserProfile = {
   alert_deadlines_enabled: true,
   alert_balances_enabled: false,
   alert_reports_enabled: false,
+  reminder_window_start_days: 5,
+  reminder_window_end_days: 7,
 };
 
 function renderSidebar(user: UserProfile = baseUser) {
@@ -47,7 +49,7 @@ describe('Sidebar', () => {
 
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.queryByText('Family Office')).not.toBeInTheDocument();
-    expect(screen.getByText('Notificaciones')).toBeInTheDocument();
+    expect(screen.queryByText('Notificaciones')).not.toBeInTheDocument();
   });
 
   it('oculta notificaciones cuando todas las alertas estan desactivadas', () => {
