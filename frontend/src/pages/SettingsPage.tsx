@@ -295,7 +295,8 @@ export default function SettingsPage() {
 
                     {!isAdmin && (
                       <p className="mt-2 text-xs text-neutral-muted">
-                        Solo el usuario administrador puede modificar este rango.
+                        Solo el usuario administrador puede modificar este
+                        rango.
                       </p>
                     )}
                   </div>

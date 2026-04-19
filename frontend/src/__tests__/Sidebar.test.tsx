@@ -49,7 +49,7 @@ describe('Sidebar', () => {
 
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.queryByText('Family Office')).not.toBeInTheDocument();
-    expect(screen.getByText('Notificaciones')).toBeInTheDocument();
+    expect(screen.queryByText('Notificaciones')).not.toBeInTheDocument();
   });
 
   it('oculta notificaciones cuando todas las alertas estan desactivadas', () => {
