@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Briefcase,
   ArrowLeftRight,
+  CreditCard,
   FileText,
   BarChart2,
   Settings,
@@ -34,6 +35,12 @@ const mainItems = [
     icon: ArrowLeftRight,
     path: '/flujo-de-caja',
     roles: ['admin', 'contador_family_office', 'contador_cole_co'],
+  },
+  {
+    label: 'Pagos',
+    icon: CreditCard,
+    path: '/pagos',
+    roles: ['admin', 'contador_cole_co'],
   },
   {
     label: 'Facturas',

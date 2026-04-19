@@ -11,6 +11,7 @@ import React from 'react';
 import SettingsPage from './pages/SettingsPage';
 import NotificationsPage from './pages/NotificationsPage';
 import CashFlowPage from './pages/CashFlowPage';
+import PaymentsPage from './pages/PaymentsPage';
 
 function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   return (
@@ -67,6 +68,16 @@ function App() {
             <ProtectedRoute>
               <LayoutWithSidebar>
                 <CashFlowPage />
+              </LayoutWithSidebar>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pagos"
+          element={
+            <ProtectedRoute>
+              <LayoutWithSidebar>
+                <PaymentsPage />
               </LayoutWithSidebar>
             </ProtectedRoute>
           }

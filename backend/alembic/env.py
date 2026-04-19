@@ -26,6 +26,7 @@ from src.modules.family_office.companies import models as company_models
 from src.modules.family_office.balances import models as balance_models
 from src.modules.family_office.deadlines import models as deadline_models
 from src.modules.cole_co.cash_flow import models as cash_flow_models
+from src.modules.cole_co.payments import models as payment_models
 # =================================================================
 
 
