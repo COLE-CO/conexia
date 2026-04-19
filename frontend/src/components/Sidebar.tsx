@@ -49,13 +49,18 @@ const mainItems = [
   },
 ];
 
+const NOTIFICATIONS_ALLOWED_ROLES = ['admin', 'contador_family_office'];
+
 export default function Sidebar() {
   const { isExpanded, toggle } = useSidebar();
   const { logout, user } = useContext(AuthContext);
   const { clearActiveCompany } = useCompany();
   const navigate = useNavigate();
   const roleLabel = user?.role?.replaceAll('_', ' ');
-  const hasEnabledAlerts = user?.alert_deadlines_enabled;
+  const hasNotificationsAccess =
+    !!user?.role && NOTIFICATIONS_ALLOWED_ROLES.includes(user.role);
+  const hasEnabledAlerts = !!user?.alert_deadlines_enabled;
+  const canSeeNotifications = hasNotificationsAccess && hasEnabledAlerts;
 
   const handleLogout = () => {
     logout();
@@ -132,7 +137,7 @@ export default function Sidebar() {
         {/* Sección inferior */}
         <div className="px-2 pb-2 flex flex-col gap-1">
           {/* Notificaciones */}
-          {hasEnabledAlerts && (
+          {canSeeNotifications && (
             <NavLink
               to="/notificaciones"
               className={({ isActive }) => `

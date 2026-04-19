@@ -177,19 +177,10 @@ export const useNotifications = ({
           return currentIds;
         }
 
-        const nextReadIds = [...currentIds, notificationId];
-
-        if (user?.id) {
-          localStorage.setItem(
-            buildStorageKey(user.id),
-            JSON.stringify(nextReadIds)
-          );
-        }
-
-        return nextReadIds;
+        return [...currentIds, notificationId];
       });
     },
-    [user?.id]
+    []
   );
 
   const retry = useCallback(() => {

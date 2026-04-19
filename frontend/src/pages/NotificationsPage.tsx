@@ -7,12 +7,24 @@ import { getCompanies } from '../services/companyService';
 import type { Company } from '../services/companyService';
 import NotificationsPageSkeleton from '../features/notifications/components/NotificationsPageSkeleton';
 
+const NOTIFICATIONS_ALLOWED_ROLES = ['admin', 'contador_family_office'];
+
 const formatNotificationDate = (isoDate: string) => {
+  const [year, month, day] = isoDate
+    .split('T')[0]
+    .split('-')
+    .map((value) => Number(value));
+
+  const parsedDate =
+    Number.isFinite(year) && Number.isFinite(month) && Number.isFinite(day)
+      ? new Date(year, month - 1, day)
+      : new Date(isoDate);
+
   return new Intl.DateTimeFormat('es-CO', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
-  }).format(new Date(isoDate));
+  }).format(parsedDate);
 };
 
 const getNotificationVisual = () => {
@@ -34,7 +46,9 @@ export default function NotificationsPage() {
   const [companiesError, setCompaniesError] = useState<string | null>(null);
   const [companiesReloadKey, setCompaniesReloadKey] = useState(0);
 
-  const hasEnabledAlerts = !!user?.alert_deadlines_enabled;
+  const hasNotificationsAccess =
+    !!user?.role && NOTIFICATIONS_ALLOWED_ROLES.includes(user.role);
+  const hasEnabledAlerts = hasNotificationsAccess && !!user?.alert_deadlines_enabled;
 
   useEffect(() => {
     if (!hasEnabledAlerts) {
@@ -72,12 +86,6 @@ export default function NotificationsPage() {
       ignore = true;
     };
   }, [companiesReloadKey, hasEnabledAlerts]);
-
-  useEffect(() => {
-    if (activeCompany?.id && selectedCompanyFilter === 'all') {
-      setSelectedCompanyFilter(String(activeCompany.id));
-    }
-  }, [activeCompany?.id, selectedCompanyFilter]);
 
   const companyNameById = useMemo(() => {
     return companies.reduce<Record<number, string>>((acc, company) => {
@@ -162,6 +170,19 @@ export default function NotificationsPage() {
         </div>
 
         {!hasEnabledAlerts ? (
+          !hasNotificationsAccess ? (
+            <div className="rounded-3xl border border-dashed border-neutral-border bg-neutral-surface p-10 text-center shadow-sm">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-bg text-neutral-muted">
+                <BellOff size={22} />
+              </div>
+              <h2 className="text-lg font-bold text-neutral-text">
+                Sin acceso al centro de notificaciones
+              </h2>
+              <p className="mt-2 text-sm text-neutral-muted">
+                Este modulo esta disponible solo para admin y contador family office.
+              </p>
+            </div>
+          ) : (
           <div className="rounded-3xl border border-dashed border-neutral-border bg-neutral-surface p-10 text-center shadow-sm">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-bg text-neutral-muted">
               <BellOff size={22} />
@@ -174,6 +195,7 @@ export default function NotificationsPage() {
               este módulo.
             </p>
           </div>
+          )
         ) : isInitiallyLoading ? (
           <NotificationsPageSkeleton />
         ) : (
@@ -196,11 +218,11 @@ export default function NotificationsPage() {
                   </p>
                 </div>
 
-                <div className="rounded-2xl border-2 border-emerald-400 p-4">
-                  <p className="text-xs uppercase tracking-wide text-emerald-700">
+                <div className="rounded-2xl border-2 border-primary p-4">
+                  <p className="text-xs uppercase tracking-wide text-primary">
                     Leídas
                   </p>
-                  <p className="mt-1 text-2xl font-bold text-emerald-700">
+                  <p className="mt-1 text-2xl font-bold text-primary">
                     {readCount}
                   </p>
                 </div>
