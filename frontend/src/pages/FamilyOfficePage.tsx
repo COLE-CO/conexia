@@ -18,6 +18,7 @@ import type { Deadline } from '../services/deadlineService';
 import UploadBalanceModal from '../components/UploadBalanceModal';
 import DeadlineCard from '../components/DeadlineCard';
 import DeadlineModal from '../components/DeadlineModal';
+import ReportModal from '../components/ReportModal';
 import {
   TrendingUp,
   TrendingDown,
@@ -83,6 +84,10 @@ export default function FamilyOfficePage() {
   const [confirmDeleteBalance, setConfirmDeleteBalance] = useState<
     number | null
   >(null);
+
+  // Reportes IA
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportBalanceId, setReportBalanceId] = useState<number | null>(null);
 
   // Vencimientos
   const [deadlines, setDeadlines] = useState<Deadline[]>([]);
@@ -248,7 +253,13 @@ export default function FamilyOfficePage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-neutral-border bg-neutral-surface text-neutral-text text-sm hover:bg-neutral-bg transition-colors duration-200 shadow-sm">
+          <button
+            onClick={() => {
+              setReportBalanceId(null);
+              setShowReportModal(true);
+            }}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-neutral-border bg-neutral-surface text-neutral-text text-sm hover:bg-neutral-bg transition-colors duration-200 shadow-sm"
+          >
             <Sparkles size={16} />
             Generar reporte IA
           </button>
@@ -420,6 +431,15 @@ export default function FamilyOfficePage() {
                     <Download size={15} /> Exportar
                   </button>
                   <button
+                    onClick={() => {
+                      setReportBalanceId(balance.id);
+                      setShowReportModal(true);
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-secondary/30 text-sm text-secondary hover:bg-secondary/5 transition-colors duration-200"
+                  >
+                    <Sparkles size={15} /> Reporte IA
+                  </button>
+                  <button
                     onClick={() => setConfirmDeleteBalance(balance.id)}
                     className="p-1.5 rounded-lg border border-neutral-border text-red-400 hover:bg-red-50 transition-colors duration-200"
                   >
@@ -517,6 +537,18 @@ export default function FamilyOfficePage() {
           Módulo de cartera próximamente.
         </div>
       </div>
+
+      {/* Modal reporte IA */}
+      {showReportModal && (
+        <ReportModal
+          onClose={() => {
+            setShowReportModal(false);
+            setReportBalanceId(null);
+          }}
+          balanceId={reportBalanceId ?? undefined}
+          balances={visibleBalances}
+        />
+      )}
 
       {/* Modal subir balance */}
       {showUploadModal && (
