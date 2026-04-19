@@ -25,3 +25,5 @@ class User(Base):
     alert_deadlines_enabled = Column(Boolean, default=True, nullable=False)
     alert_balances_enabled = Column(Boolean, default=True, nullable=False)
     alert_reports_enabled = Column(Boolean, default=True, nullable=False)
+    reminder_window_start_days = Column(Integer, default=5, nullable=False)
+    reminder_window_end_days = Column(Integer, default=7, nullable=False)

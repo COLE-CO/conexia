@@ -94,4 +94,26 @@ def update_my_profile(
     if existing_user and existing_user.id != current_user.id:
         raise HTTPException(status_code=400, detail="Email already registered")
 
+    if profile_data.reminder_window_start_days < 0:
+        raise HTTPException(
+            status_code=400,
+            detail="El inicio del rango de recordatorios debe ser mayor o igual a 0",
+        )
+
+    if profile_data.reminder_window_end_days < 0:
+        raise HTTPException(
+            status_code=400,
+            detail="El fin del rango de recordatorios debe ser mayor o igual a 0",
+        )
+
+    if profile_data.reminder_window_start_days > profile_data.reminder_window_end_days:
+        raise HTTPException(
+            status_code=400,
+            detail="El inicio del rango no puede ser mayor al fin del rango",
+        )
+
+    if current_user.role != models.UserRole.ADMIN:
+        profile_data.reminder_window_start_days = current_user.reminder_window_start_days
+        profile_data.reminder_window_end_days = current_user.reminder_window_end_days
+
     return service.update_user_profile(db, current_user, profile_data)

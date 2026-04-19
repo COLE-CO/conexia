@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -23,8 +24,11 @@ class Settings(BaseSettings):
     # S3
     AWS_ACCESS_KEY_ID: str
     AWS_SECRET_ACCESS_KEY: str
+    AWS_SESSION_TOKEN: Optional[str] = None
     AWS_REGION: str
     AWS_BUCKET_NAME: str
 
+    # Email
+    RESEND_API_KEY: str
 
 settings = Settings()

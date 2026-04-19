@@ -12,3 +12,5 @@ alembic==1.18.4
 boto3==1.37.13
 ruff==0.15.6
 bandit==1.9.4
+resend>=2.0.0
+apscheduler>=3.10.0

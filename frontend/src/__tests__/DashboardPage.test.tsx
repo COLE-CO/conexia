@@ -102,6 +102,8 @@ const baseUser: UserProfile = {
   alert_deadlines_enabled: true,
   alert_balances_enabled: true,
   alert_reports_enabled: false,
+  reminder_window_start_days: 5,
+  reminder_window_end_days: 7,
 };
 
 function renderPage(user: UserProfile) {
