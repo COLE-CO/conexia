@@ -2,7 +2,6 @@ import { useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import {
-  ADMIN_ROLE,
   CASH_FLOW_ALLOWED_ROLES,
   NOTIFICATIONS_ALLOWED_ROLES,
 } from '../constants/authorization';
