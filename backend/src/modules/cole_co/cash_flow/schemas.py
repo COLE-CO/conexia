@@ -44,3 +44,40 @@ class CashMovementResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class MonthlySummaryResponse(BaseModel):
+    account_id: int
+    account_name: str
+    year: int
+    month: int
+    opening_balance: Decimal
+    total_income: Decimal
+    total_expenses: Decimal
+    closing_balance: Decimal
+    is_closed: bool
+    closed_at: datetime | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class MonthlyCloseRequest(BaseModel):
+    account_id: int
+    year: int = Field(..., ge=2020, le=2100)
+    month: int = Field(..., ge=1, le=12)
+
+
+class MonthlyClosingResponse(BaseModel):
+    id: int
+    account_id: int
+    year: int
+    month: int
+    opening_balance: Decimal
+    total_income: Decimal
+    total_expenses: Decimal
+    closing_balance: Decimal
+    is_closed: bool
+    closed_at: datetime | None = None
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)

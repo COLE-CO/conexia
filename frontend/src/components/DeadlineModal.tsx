@@ -17,6 +17,8 @@ interface Props {
 export default function DeadlineModal({ onClose, onSuccess, editing }: Props) {
   const { activeCompany } = useCompany();
   const [name, setName] = useState('');
+  const [clientEmail, setClientEmail] = useState('');
+  const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,6 +27,8 @@ export default function DeadlineModal({ onClose, onSuccess, editing }: Props) {
   useEffect(() => {
     if (editing) {
       setName(editing.name);
+      setClientEmail(editing.client_email ?? '');
+      setAmount(editing.amount ?? '');
       setDescription(editing.description ?? '');
       setDueDate(editing.due_date.slice(0, 10));
     }
@@ -37,6 +41,10 @@ export default function DeadlineModal({ onClose, onSuccess, editing }: Props) {
     }
     if (!dueDate) {
       setError('La fecha de vencimiento es obligatoria.');
+      return;
+    }
+    if (!clientEmail.trim()) {
+      setError('El correo del cliente es obligatorio.');
       return;
     }
     if (!activeCompany && !editing) {
@@ -52,6 +60,8 @@ export default function DeadlineModal({ onClose, onSuccess, editing }: Props) {
       if (editing) {
         const data: UpdateDeadline = {
           name,
+          client_email: clientEmail.trim(),
+          amount: amount.trim() || undefined,
           description: description || undefined,
           due_date: dueDate,
         };
@@ -60,6 +70,8 @@ export default function DeadlineModal({ onClose, onSuccess, editing }: Props) {
         const data: CreateDeadline = {
           company_id: activeCompany!.id,
           name,
+          client_email: clientEmail.trim(),
+          amount: amount.trim() || undefined,
           description: description || undefined,
           due_date: dueDate,
         };
@@ -106,6 +118,34 @@ export default function DeadlineModal({ onClose, onSuccess, editing }: Props) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Ej: Declaración de renta"
+            className="w-full px-3 py-2 rounded-lg border border-neutral-border bg-neutral-bg text-sm text-neutral-text focus:outline-none focus:border-secondary"
+          />
+        </div>
+
+        {/* Correo del cliente */}
+        <div className="mb-4">
+          <label className="text-xs text-neutral-muted mb-1 block">
+            Correo del cliente *
+          </label>
+          <input
+            type="email"
+            value={clientEmail}
+            onChange={(e) => setClientEmail(e.target.value)}
+            placeholder="cliente@correo.com"
+            className="w-full px-3 py-2 rounded-lg border border-neutral-border bg-neutral-bg text-sm text-neutral-text focus:outline-none focus:border-secondary"
+          />
+        </div>
+
+        {/* Monto */}
+        <div className="mb-4">
+          <label className="text-xs text-neutral-muted mb-1 block">
+            Monto (opcional)
+          </label>
+          <input
+            type="text"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="Ej: 1200000"
             className="w-full px-3 py-2 rounded-lg border border-neutral-border bg-neutral-bg text-sm text-neutral-text focus:outline-none focus:border-secondary"
           />
         </div>

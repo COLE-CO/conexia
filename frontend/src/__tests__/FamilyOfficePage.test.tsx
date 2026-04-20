@@ -115,16 +115,13 @@ describe('FamilyOfficePage', () => {
 
   it('solicita confirmacion antes de eliminar un balance y lo elimina al confirmar', async () => {
     const user = userEvent.setup();
-    vi.stubGlobal(
-      'confirm',
-      vi.fn(() => true)
-    );
 
     renderPage();
 
     expect(await screen.findByText('balance-marzo.xlsx')).toBeInTheDocument();
 
     await user.click(getDeleteButtonForBalance('balance-marzo.xlsx'));
+    await user.click(screen.getByRole('button', { name: 'Eliminar' }));
 
     await waitFor(() => {
       expect(deleteBalanceMock).toHaveBeenCalledWith(10);
@@ -135,16 +132,13 @@ describe('FamilyOfficePage', () => {
 
   it('conserva el balance cuando el usuario cancela la eliminacion', async () => {
     const user = userEvent.setup();
-    vi.stubGlobal(
-      'confirm',
-      vi.fn(() => false)
-    );
 
     renderPage();
 
     expect(await screen.findByText('balance-marzo.xlsx')).toBeInTheDocument();
 
     await user.click(getDeleteButtonForBalance('balance-marzo.xlsx'));
+    await user.click(screen.getByRole('button', { name: 'Cancelar' }));
 
     expect(deleteBalanceMock).not.toHaveBeenCalled();
     expect(screen.getByText('balance-marzo.xlsx')).toBeInTheDocument();

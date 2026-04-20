@@ -1,6 +1,7 @@
 import enum
 
 from sqlalchemy import (
+    Boolean,
     Column,
     Date,
     DateTime,
@@ -8,6 +9,7 @@ from sqlalchemy import (
     Integer,
     Numeric,
     String,
+    UniqueConstraint,
     func,
 )
 from sqlalchemy import Enum as SqlEnum
@@ -44,6 +46,12 @@ class CashAccount(Base):
         cascade="save-update, merge",
         passive_deletes=True,
     )
+    closings = relationship(
+        "CashMonthlyClosing",
+        back_populates="account",
+        cascade="save-update, merge",
+        passive_deletes=True,
+    )
 
 
 class CashMovement(Base):
@@ -75,3 +83,36 @@ class CashMovement(Base):
     @property
     def account_name(self) -> str:
         return self.account.name
+
+
+class CashMonthlyClosing(Base):
+    __tablename__ = "cash_monthly_closings"
+    __table_args__ = (
+        UniqueConstraint(
+            "account_id", "year", "month", name="uq_closing_account_year_month"
+        ),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    account_id = Column(
+        Integer,
+        ForeignKey("cash_accounts.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+    year = Column(Integer, nullable=False)
+    month = Column(Integer, nullable=False)
+    opening_balance = Column(Numeric(14, 2), nullable=False)
+    total_income = Column(Numeric(14, 2), nullable=False)
+    total_expenses = Column(Numeric(14, 2), nullable=False)
+    closing_balance = Column(Numeric(14, 2), nullable=False)
+    is_closed = Column(Boolean, nullable=False, default=False)
+    closed_at = Column(DateTime(timezone=True), nullable=True)
+    closed_by_user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    created_at = Column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    account = relationship("CashAccount", back_populates="closings")

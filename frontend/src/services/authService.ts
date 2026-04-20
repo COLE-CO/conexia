@@ -10,6 +10,8 @@ export interface UserProfile {
   alert_deadlines_enabled: boolean;
   alert_balances_enabled: boolean;
   alert_reports_enabled: boolean;
+  reminder_window_start_days: number;
+  reminder_window_end_days: number;
 }
 
 export interface UpdateProfilePayload {
@@ -18,6 +20,8 @@ export interface UpdateProfilePayload {
   alert_deadlines_enabled: boolean;
   alert_balances_enabled: boolean;
   alert_reports_enabled: boolean;
+  reminder_window_start_days: number;
+  reminder_window_end_days: number;
 }
 
 export const login = async (username: string, password: string) => {
