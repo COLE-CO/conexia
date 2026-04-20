@@ -29,6 +29,11 @@ app.include_router(deadlines_router)
 app.include_router(reports_router)
 
 
+@app.get("/")
+def root():
+    return {"message": "API is running"}
+
+
 @app.on_event("startup")
 def startup_event():
     start_scheduler()
@@ -37,8 +42,3 @@ def startup_event():
 @app.on_event("shutdown")
 def shutdown_event():
     stop_scheduler()
-
-
-@app.get("/")
-def root():
-    return {"message": "API is running"}

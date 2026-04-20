@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     ADMIN_PASSWORD: str
 
     # OpenAI
-    OPENAI_API_KEY: str | None = None
+    OPENAI_API_KEY: str
 
     # S3
     AWS_ACCESS_KEY_ID: str
