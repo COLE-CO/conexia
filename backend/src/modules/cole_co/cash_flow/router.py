@@ -11,7 +11,6 @@ router = APIRouter(prefix="/cash-flow", tags=["Cash Flow"])
 
 ALLOWED_ROLES = [
     auth_models.UserRole.ADMIN,
-    auth_models.UserRole.CONTADOR_COLE_CO,
 ]
 
 

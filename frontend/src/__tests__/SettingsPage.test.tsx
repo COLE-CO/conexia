@@ -26,7 +26,6 @@ const baseUser: UserProfile = {
 };
 
 function renderPage(user: UserProfile = baseUser) {
-  const patchUser = vi.fn();
   const setUser = vi.fn();
   const refreshUser = vi.fn().mockResolvedValue(undefined);
 
@@ -39,7 +38,7 @@ function renderPage(user: UserProfile = baseUser) {
         loginState: vi.fn(),
         logout: vi.fn(),
         refreshUser,
-        patchUser,
+        patchUser: vi.fn(),
         setUser,
       }}
     >
@@ -47,7 +46,7 @@ function renderPage(user: UserProfile = baseUser) {
     </AuthContext.Provider>
   );
 
-  return { patchUser, setUser, refreshUser };
+  return { setUser, refreshUser };
 }
 
 describe('SettingsPage', () => {
@@ -63,17 +62,17 @@ describe('SettingsPage', () => {
     expect(screen.getByText(/contador family office/i)).toBeInTheDocument();
   });
 
-  it('permite alternar las alertas desde el perfil', async () => {
+  it('permite alternar las alertas desde el perfil antes de guardar', async () => {
     const user = userEvent.setup();
-    const { patchUser } = renderPage();
+    renderPage();
 
     await user.click(
-      screen.getByRole('button', { name: /alternar alertas de vencimientos/i })
+      screen.getByRole('switch', { name: /alertas de vencimientos/i })
     );
 
-    expect(patchUser).toHaveBeenCalledWith({
-      alert_deadlines_enabled: false,
-    });
+    expect(
+      screen.getByRole('switch', { name: /alertas de vencimientos/i })
+    ).toHaveAttribute('aria-checked', 'false');
   });
 
   it('guarda los cambios del perfil y muestra confirmacion', async () => {
@@ -88,6 +87,7 @@ describe('SettingsPage', () => {
     const nameInput = screen.getByDisplayValue('QA Analyst');
     await user.clear(nameInput);
     await user.type(nameInput, 'QA Lead');
+    await user.click(screen.getByRole('switch', { name: /alertas de reportes/i }));
     await user.click(screen.getByRole('button', { name: /guardar cambios/i }));
 
     await waitFor(() => {
@@ -96,7 +96,7 @@ describe('SettingsPage', () => {
         email: 'qa@conexia.com',
         alert_deadlines_enabled: true,
         alert_balances_enabled: true,
-        alert_reports_enabled: false,
+        alert_reports_enabled: true,
         reminder_window_start_days: 5,
         reminder_window_end_days: 7,
       });

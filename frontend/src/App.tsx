@@ -11,6 +11,7 @@ import React from 'react';
 import SettingsPage from './pages/SettingsPage';
 import NotificationsPage from './pages/NotificationsPage';
 import CashFlowPage from './pages/CashFlowPage';
+import { CASH_FLOW_ALLOWED_ROLES } from './constants/authorization';
 
 function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   return (
@@ -64,7 +65,7 @@ function App() {
         <Route
           path="/flujo-de-caja"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={CASH_FLOW_ALLOWED_ROLES}>
               <LayoutWithSidebar>
                 <CashFlowPage />
               </LayoutWithSidebar>
