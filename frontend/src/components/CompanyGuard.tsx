@@ -13,20 +13,59 @@ interface Props {
   children: ReactNode;
 }
 
+function CompanyGuardSkeleton() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-neutral-bg px-4">
+      <div className="w-full max-w-lg animate-pulse">
+        {/* Ícono + título */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-14 h-14 bg-neutral-border rounded-2xl mb-4" />
+          <div className="h-7 w-56 bg-neutral-border rounded-lg mb-2" />
+          <div className="h-4 w-72 bg-neutral-border rounded" />
+        </div>
+
+        {/* Barra búsqueda + botón */}
+        <div className="flex gap-2 mb-4">
+          <div className="flex-1 h-11 bg-neutral-border rounded-xl" />
+          <div className="h-11 w-36 bg-neutral-border rounded-xl" />
+        </div>
+
+        {/* Lista */}
+        <div className="bg-neutral-surface border border-neutral-border rounded-2xl overflow-hidden">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className={`flex items-center gap-3 px-5 py-4 ${i !== 3 ? 'border-b border-neutral-border' : ''}`}
+            >
+              <div className="w-9 h-9 rounded-xl bg-neutral-border flex-shrink-0" />
+              <div className="flex-1 space-y-1.5">
+                <div className="h-4 w-32 bg-neutral-border rounded" />
+                <div className="h-3 w-24 bg-neutral-border rounded" />
+              </div>
+              <div className="h-4 w-4 bg-neutral-border rounded" />
+            </div>
+          ))}
+        </div>
+
+        {/* Counter */}
+        <div className="h-3 w-32 bg-neutral-border rounded mx-auto mt-4" />
+      </div>
+    </div>
+  );
+}
+
 export default function CompanyGuard({ children }: Props) {
   const { activeCompany, setActiveCompany } = useCompany();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
-  // Modal crear
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
   const [newNit, setNewNit] = useState('');
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
 
-  // Confirmación eliminar
   const [confirmDelete, setConfirmDelete] = useState<Company | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
@@ -83,16 +122,7 @@ export default function CompanyGuard({ children }: Props) {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-bg">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-neutral-muted">Cargando empresas...</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <CompanyGuardSkeleton />;
 
   if (!activeCompany) {
     return (
@@ -115,10 +145,7 @@ export default function CompanyGuard({ children }: Props) {
           <div className="flex gap-2 mb-4">
             {companies.length > 3 && (
               <div className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-surface border border-neutral-border focus-within:border-secondary transition-colors duration-200 shadow-sm">
-                <Search
-                  size={16}
-                  className="text-neutral-muted flex-shrink-0"
-                />
+                <Search size={16} className="text-neutral-muted flex-shrink-0" />
                 <input
                   type="text"
                   value={search}
@@ -163,7 +190,6 @@ export default function CompanyGuard({ children }: Props) {
                     ${index !== filtered.length - 1 ? 'border-b border-neutral-border' : ''}
                   `}
                 >
-                  {/* Info empresa */}
                   <button
                     onClick={() => setActiveCompany(company)}
                     className="flex items-center gap-3 flex-1 text-left"
@@ -185,7 +211,6 @@ export default function CompanyGuard({ children }: Props) {
                     </div>
                   </button>
 
-                  {/* Acciones */}
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setActiveCompany(company)}
@@ -207,9 +232,7 @@ export default function CompanyGuard({ children }: Props) {
 
           <p className="text-center text-xs text-neutral-muted mt-4">
             {companies.length}{' '}
-            {companies.length === 1
-              ? 'empresa registrada'
-              : 'empresas registradas'}
+            {companies.length === 1 ? 'empresa registrada' : 'empresas registradas'}
           </p>
         </div>
 
@@ -235,9 +258,7 @@ export default function CompanyGuard({ children }: Props) {
               </div>
 
               <div className="mb-4">
-                <label className="text-xs text-neutral-muted mb-1 block">
-                  Nombre *
-                </label>
+                <label className="text-xs text-neutral-muted mb-1 block">Nombre *</label>
                 <input
                   type="text"
                   value={newName}
@@ -249,9 +270,7 @@ export default function CompanyGuard({ children }: Props) {
               </div>
 
               <div className="mb-4">
-                <label className="text-xs text-neutral-muted mb-1 block">
-                  NIT (opcional)
-                </label>
+                <label className="text-xs text-neutral-muted mb-1 block">NIT (opcional)</label>
                 <input
                   type="text"
                   value={newNit}
@@ -261,9 +280,7 @@ export default function CompanyGuard({ children }: Props) {
                 />
               </div>
 
-              {createError && (
-                <p className="text-xs text-red-400 mb-4">{createError}</p>
-              )}
+              {createError && <p className="text-xs text-red-400 mb-4">{createError}</p>}
 
               <div className="flex gap-3">
                 <button
@@ -298,26 +315,19 @@ export default function CompanyGuard({ children }: Props) {
                   <Trash2 size={18} className="text-red-400" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-neutral-text">
-                    Eliminar empresa
-                  </h3>
-                  <p className="text-xs text-neutral-muted">
-                    Esta acción no se puede deshacer
-                  </p>
+                  <h3 className="text-base font-bold text-neutral-text">Eliminar empresa</h3>
+                  <p className="text-xs text-neutral-muted">Esta acción no se puede deshacer</p>
                 </div>
               </div>
 
               <p className="text-sm text-neutral-text mb-4">
                 ¿Seguro que deseas eliminar{' '}
-                <span className="font-semibold">{confirmDelete.name}</span>? Se
-                perderán todos sus datos asociados.
+                <span className="font-semibold">{confirmDelete.name}</span>? Se perderán todos sus datos asociados.
               </p>
 
               <div className="mb-5">
                 <label className="text-xs text-neutral-muted mb-1 block">
-                  Escribe{' '}
-                  <span className="font-bold text-neutral-text">CONFIRMAR</span>{' '}
-                  para continuar
+                  Escribe <span className="font-bold text-neutral-text">CONFIRMAR</span> para continuar
                 </label>
                 <input
                   type="text"
@@ -329,9 +339,7 @@ export default function CompanyGuard({ children }: Props) {
               </div>
 
               <div className="flex gap-3">
-                {deleteError && (
-                  <p className="text-xs text-red-400 mb-4">{deleteError}</p>
-                )}
+                {deleteError && <p className="text-xs text-red-400 mb-4">{deleteError}</p>}
                 <button
                   onClick={() => {
                     setConfirmDelete(null);
