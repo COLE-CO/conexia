@@ -87,7 +87,9 @@ describe('SettingsPage', () => {
     const nameInput = screen.getByDisplayValue('QA Analyst');
     await user.clear(nameInput);
     await user.type(nameInput, 'QA Lead');
-    await user.click(screen.getByRole('switch', { name: /alertas de reportes/i }));
+    await user.click(
+      screen.getByRole('switch', { name: /alertas de reportes/i })
+    );
     await user.click(screen.getByRole('button', { name: /guardar cambios/i }));
 
     await waitFor(() => {

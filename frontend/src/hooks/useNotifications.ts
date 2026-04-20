@@ -72,9 +72,15 @@ export const useNotifications = ({
   companyIds,
   companyNameById = {},
 }: UseNotificationsParams) => {
-  const [deadlineSources, setDeadlineSources] = useState<DeadlineNotificationSource[]>([]);
-  const [balanceSources, setBalanceSources] = useState<BalanceNotificationSource[]>([]);
-  const [reportEvents, setReportEvents] = useState<StoredNotificationEvent[]>([]);
+  const [deadlineSources, setDeadlineSources] = useState<
+    DeadlineNotificationSource[]
+  >([]);
+  const [balanceSources, setBalanceSources] = useState<
+    BalanceNotificationSource[]
+  >([]);
+  const [reportEvents, setReportEvents] = useState<StoredNotificationEvent[]>(
+    []
+  );
   const [loading, setLoading] = useState(
     !!user?.alert_deadlines_enabled ||
       !!user?.alert_balances_enabled ||
@@ -166,7 +172,11 @@ export const useNotifications = ({
         const nextBalanceSources = shouldLoadBalances
           ? byCompany
               .flatMap(({ companyId, companyName, balancesData }) =>
-                balancesData.map((balance) => ({ companyId, companyName, balance }))
+                balancesData.map((balance) => ({
+                  companyId,
+                  companyName,
+                  balance,
+                }))
               )
               .sort((a, b) =>
                 compareByIsoDateDesc(

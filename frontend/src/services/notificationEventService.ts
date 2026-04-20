@@ -13,7 +13,9 @@ export interface StoredNotificationEvent {
 const buildStorageKey = (userId: number) =>
   `conexia.notifications.events.${userId}`;
 
-const parseStoredEvents = (rawValue: string | null): StoredNotificationEvent[] => {
+const parseStoredEvents = (
+  rawValue: string | null
+): StoredNotificationEvent[] => {
   if (!rawValue) {
     return [];
   }
@@ -46,6 +48,12 @@ export const appendStoredNotificationEvent = (
   event: StoredNotificationEvent
 ) => {
   const currentEvents = getStoredNotificationEvents(userId);
-  const nextEvents = [event, ...currentEvents.filter((item) => item.id !== event.id)];
-  localStorage.setItem(buildStorageKey(userId), JSON.stringify(nextEvents.slice(0, 50)));
+  const nextEvents = [
+    event,
+    ...currentEvents.filter((item) => item.id !== event.id),
+  ];
+  localStorage.setItem(
+    buildStorageKey(userId),
+    JSON.stringify(nextEvents.slice(0, 50))
+  );
 };
