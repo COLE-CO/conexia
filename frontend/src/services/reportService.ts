@@ -63,7 +63,9 @@ export async function generateReport(balanceId: number): Promise<ReportData> {
   return data;
 }
 
-export async function exportReportPDF(payload: ExportPDFRequest): Promise<void> {
+export async function exportReportPDF(
+  payload: ExportPDFRequest
+): Promise<void> {
   const response = await api.post('/reports/export-pdf', payload, {
     responseType: 'blob',
   });
@@ -72,7 +74,9 @@ export async function exportReportPDF(payload: ExportPDFRequest): Promise<void> 
   const link = document.createElement('a');
   link.href = url;
 
-  const disposition = response.headers['content-disposition'] as string | undefined;
+  const disposition = response.headers['content-disposition'] as
+    | string
+    | undefined;
   const match = disposition?.match(/filename=(.+)/);
   link.download = match ? match[1] : 'reporte.pdf';
 
@@ -82,7 +86,9 @@ export async function exportReportPDF(payload: ExportPDFRequest): Promise<void> 
   window.URL.revokeObjectURL(url);
 }
 
-export async function saveReport(payload: SaveReportRequest): Promise<SavedReport> {
+export async function saveReport(
+  payload: SaveReportRequest
+): Promise<SavedReport> {
   const { data } = await api.post<SavedReport>('/reports/save', payload);
   return data;
 }
@@ -90,12 +96,16 @@ export async function saveReport(payload: SaveReportRequest): Promise<SavedRepor
 export async function getSavedReportsByCompany(
   companyId: number
 ): Promise<SavedReport[]> {
-  const { data } = await api.get<SavedReport[]>(`/reports/company/${companyId}`);
+  const { data } = await api.get<SavedReport[]>(
+    `/reports/company/${companyId}`
+  );
   return data;
 }
 
 export async function downloadSavedReport(reportId: number): Promise<void> {
-  const { data } = await api.get<{ url: string }>(`/reports/${reportId}/download`);
+  const { data } = await api.get<{ url: string }>(
+    `/reports/${reportId}/download`
+  );
   window.open(data.url, '_blank');
 }
 

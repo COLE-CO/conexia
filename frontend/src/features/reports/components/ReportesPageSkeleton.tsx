@@ -18,7 +18,10 @@ export default function ReportesPageSkeleton() {
           {/* Métricas */}
           <div className="grid grid-cols-3 gap-2 mb-4">
             {Array.from({ length: 3 }).map((_, j) => (
-              <div key={j} className="bg-neutral-border/40 border border-neutral-border rounded-xl p-2.5 space-y-1.5">
+              <div
+                key={j}
+                className="bg-neutral-border/40 border border-neutral-border rounded-xl p-2.5 space-y-1.5"
+              >
                 <div className="h-2.5 w-14 bg-neutral-border rounded" />
                 <div className="h-3.5 w-20 bg-neutral-border rounded" />
               </div>

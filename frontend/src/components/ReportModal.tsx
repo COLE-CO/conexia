@@ -1,11 +1,24 @@
 import { useState, useMemo, useEffect } from 'react';
 import {
-  X, Sparkles, FileSpreadsheet, Plus, Trash2,
-  FileDown, Loader2, TrendingUp, TrendingDown, DollarSign, Pencil,
+  X,
+  Sparkles,
+  FileSpreadsheet,
+  Plus,
+  Trash2,
+  FileDown,
+  Loader2,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Pencil,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Balance } from '../services/balanceService';
-import { generateReport, exportReportPDF, saveReport } from '../services/reportService';
+import {
+  generateReport,
+  exportReportPDF,
+  saveReport,
+} from '../services/reportService';
 import type { LineItem, ReportData } from '../services/reportService';
 import { useCompany } from '../context/CompanyContext';
 
@@ -18,11 +31,18 @@ interface Props {
 
 type Step = 'select' | 'loading' | 'ready';
 
-export default function ReportModal({ onClose, balanceId, balances, onReportSaved }: Props) {
+export default function ReportModal({
+  onClose,
+  balanceId,
+  balances,
+  onReportSaved,
+}: Props) {
   const { activeCompany } = useCompany();
   const [step, setStep] = useState<Step>(balanceId ? 'loading' : 'select');
   const [error, setError] = useState<string | null>(null);
-  const [selectedBalanceId, setSelectedBalanceId] = useState<number | null>(balanceId ?? null);
+  const [selectedBalanceId, setSelectedBalanceId] = useState<number | null>(
+    balanceId ?? null
+  );
 
   const [items, setItems] = useState<LineItem[]>([]);
   const [aiSummary, setAiSummary] = useState('');
@@ -31,13 +51,27 @@ export default function ReportModal({ onClose, balanceId, balances, onReportSave
   const [exporting, setExporting] = useState(false);
 
   const totals = useMemo(() => {
-    const totalIncome = items.filter((i) => i.category === 'ingreso').reduce((s, i) => s + i.amount, 0);
-    const totalExpenses = items.filter((i) => i.category === 'gasto').reduce((s, i) => s + i.amount, 0);
-    return { totalIncome, totalExpenses, netResult: totalIncome - totalExpenses };
+    const totalIncome = items
+      .filter((i) => i.category === 'ingreso')
+      .reduce((s, i) => s + i.amount, 0);
+    const totalExpenses = items
+      .filter((i) => i.category === 'gasto')
+      .reduce((s, i) => s + i.amount, 0);
+    return {
+      totalIncome,
+      totalExpenses,
+      netResult: totalIncome - totalExpenses,
+    };
   }, [items]);
 
-  const incomeItems = useMemo(() => items.filter((i) => i.category === 'ingreso'), [items]);
-  const expenseItems = useMemo(() => items.filter((i) => i.category === 'gasto'), [items]);
+  const incomeItems = useMemo(
+    () => items.filter((i) => i.category === 'ingreso'),
+    [items]
+  );
+  const expenseItems = useMemo(
+    () => items.filter((i) => i.category === 'gasto'),
+    [items]
+  );
 
   const handleGenerate = async (id: number) => {
     setSelectedBalanceId(id);
@@ -51,7 +85,9 @@ export default function ReportModal({ onClose, balanceId, balances, onReportSave
       setPeriod(data.period);
       setStep('ready');
     } catch {
-      setError('No se pudo generar el reporte. Verifica que el balance contenga datos válidos e intenta de nuevo.');
+      setError(
+        'No se pudo generar el reporte. Verifica que el balance contenga datos válidos e intenta de nuevo.'
+      );
       setStep('select');
     }
   };
@@ -102,12 +138,22 @@ export default function ReportModal({ onClose, balanceId, balances, onReportSave
     }
   };
 
-  const updateItem = (index: number, field: keyof LineItem, value: string | number) => {
-    setItems((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
+  const updateItem = (
+    index: number,
+    field: keyof LineItem,
+    value: string | number
+  ) => {
+    setItems((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+    );
   };
-  const removeItem = (index: number) => setItems((prev) => prev.filter((_, i) => i !== index));
+  const removeItem = (index: number) =>
+    setItems((prev) => prev.filter((_, i) => i !== index));
   const addItem = (category: 'ingreso' | 'gasto') => {
-    setItems((prev) => [...prev, { concept: '', amount: 0, category, subcategory: '' }]);
+    setItems((prev) => [
+      ...prev,
+      { concept: '', amount: 0, category, subcategory: '' },
+    ]);
   };
   const formatCurrency = (value: number) =>
     `$ ${value.toLocaleString('es-CO', { minimumFractionDigits: 0 })}`;
@@ -117,19 +163,28 @@ export default function ReportModal({ onClose, balanceId, balances, onReportSave
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
         <div className="bg-neutral-surface border border-neutral-border rounded-2xl shadow-2xl w-full max-w-md p-6">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-bold text-neutral-text font-hubot">Generar reporte con IA</h2>
-            <button onClick={onClose} className="text-neutral-muted hover:text-neutral-text bg-transparent border-none cursor-pointer">
+            <h2 className="text-lg font-bold text-neutral-text font-hubot">
+              Generar reporte con IA
+            </h2>
+            <button
+              onClick={onClose}
+              className="text-neutral-muted hover:text-neutral-text bg-transparent border-none cursor-pointer"
+            >
               <X size={20} />
             </button>
           </div>
-          <p className="text-sm text-neutral-muted mb-4">Selecciona un balance para analizar con inteligencia artificial.</p>
+          <p className="text-sm text-neutral-muted mb-4">
+            Selecciona un balance para analizar con inteligencia artificial.
+          </p>
           {error && <p className="text-xs text-red-400 mb-4">{error}</p>}
           {balances.length === 0 ? (
             <div className="text-center py-8">
               <div className="w-12 h-12 rounded-xl bg-neutral-bg border border-neutral-border flex items-center justify-center mx-auto mb-3">
                 <FileSpreadsheet size={20} className="text-neutral-muted" />
               </div>
-              <p className="text-sm text-neutral-muted">No hay balances disponibles para analizar.</p>
+              <p className="text-sm text-neutral-muted">
+                No hay balances disponibles para analizar.
+              </p>
             </div>
           ) : (
             <div className="max-h-72 overflow-y-auto space-y-2 mb-4">
@@ -143,17 +198,27 @@ export default function ReportModal({ onClose, balanceId, balances, onReportSave
                     <FileSpreadsheet size={16} className="text-neutral-muted" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-neutral-text truncate">{balance.file_name}</p>
+                    <p className="text-sm font-medium text-neutral-text truncate">
+                      {balance.file_name}
+                    </p>
                     <p className="text-xs text-neutral-muted">
-                      {balance.year}{balance.month ? `/${balance.month}` : ''} · Subido {String(balance.uploaded_at).slice(0, 10)}
+                      {balance.year}
+                      {balance.month ? `/${balance.month}` : ''} · Subido{' '}
+                      {String(balance.uploaded_at).slice(0, 10)}
                     </p>
                   </div>
-                  <Sparkles size={16} className="text-secondary flex-shrink-0" />
+                  <Sparkles
+                    size={16}
+                    className="text-secondary flex-shrink-0"
+                  />
                 </button>
               ))}
             </div>
           )}
-          <button onClick={onClose} className="w-full px-4 py-2 rounded-lg border border-neutral-border text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200">
+          <button
+            onClick={onClose}
+            className="w-full px-4 py-2 rounded-lg border border-neutral-border text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200"
+          >
             Cancelar
           </button>
         </div>
@@ -168,8 +233,12 @@ export default function ReportModal({ onClose, balanceId, balances, onReportSave
           <div className="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center mx-auto mb-5">
             <Loader2 size={28} className="text-secondary animate-spin" />
           </div>
-          <h2 className="text-lg font-bold text-neutral-text font-hubot mb-2">Analizando balance con IA</h2>
-          <p className="text-sm text-neutral-muted">Clasificando ingresos y gastos. Esto puede tomar unos segundos...</p>
+          <h2 className="text-lg font-bold text-neutral-text font-hubot mb-2">
+            Analizando balance con IA
+          </h2>
+          <p className="text-sm text-neutral-muted">
+            Clasificando ingresos y gastos. Esto puede tomar unos segundos...
+          </p>
         </div>
       </div>
     );
@@ -180,10 +249,15 @@ export default function ReportModal({ onClose, balanceId, balances, onReportSave
       <div className="bg-neutral-surface border border-neutral-border rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-border flex-shrink-0">
           <div>
-            <h2 className="text-lg font-bold text-neutral-text font-hubot">Reporte IA — {companyName}</h2>
+            <h2 className="text-lg font-bold text-neutral-text font-hubot">
+              Reporte IA — {companyName}
+            </h2>
             <p className="text-xs text-neutral-muted">{period}</p>
           </div>
-          <button onClick={onClose} className="text-neutral-muted hover:text-neutral-text bg-transparent border-none cursor-pointer">
+          <button
+            onClick={onClose}
+            className="text-neutral-muted hover:text-neutral-text bg-transparent border-none cursor-pointer"
+          >
             <X size={20} />
           </button>
         </div>
@@ -195,23 +269,44 @@ export default function ReportModal({ onClose, balanceId, balances, onReportSave
             <div className="bg-green-50 border border-green-200 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-1">
                 <TrendingUp size={16} className="text-green-600" />
-                <span className="text-xs text-green-700 font-medium">Total Ingresos</span>
+                <span className="text-xs text-green-700 font-medium">
+                  Total Ingresos
+                </span>
               </div>
-              <p className="text-xl font-bold text-green-700">{formatCurrency(totals.totalIncome)}</p>
+              <p className="text-xl font-bold text-green-700">
+                {formatCurrency(totals.totalIncome)}
+              </p>
             </div>
             <div className="bg-red-50 border border-red-200 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-1">
                 <TrendingDown size={16} className="text-red-600" />
-                <span className="text-xs text-red-700 font-medium">Total Gastos</span>
+                <span className="text-xs text-red-700 font-medium">
+                  Total Gastos
+                </span>
               </div>
-              <p className="text-xl font-bold text-red-700">{formatCurrency(totals.totalExpenses)}</p>
+              <p className="text-xl font-bold text-red-700">
+                {formatCurrency(totals.totalExpenses)}
+              </p>
             </div>
-            <div className={`border rounded-xl p-4 ${totals.netResult >= 0 ? 'bg-blue-50 border-blue-200' : 'bg-orange-50 border-orange-200'}`}>
+            <div
+              className={`border rounded-xl p-4 ${totals.netResult >= 0 ? 'bg-blue-50 border-blue-200' : 'bg-orange-50 border-orange-200'}`}
+            >
               <div className="flex items-center gap-2 mb-1">
-                <DollarSign size={16} className={totals.netResult >= 0 ? 'text-blue-600' : 'text-orange-600'} />
-                <span className={`text-xs font-medium ${totals.netResult >= 0 ? 'text-blue-700' : 'text-orange-700'}`}>Resultado Neto</span>
+                <DollarSign
+                  size={16}
+                  className={
+                    totals.netResult >= 0 ? 'text-blue-600' : 'text-orange-600'
+                  }
+                />
+                <span
+                  className={`text-xs font-medium ${totals.netResult >= 0 ? 'text-blue-700' : 'text-orange-700'}`}
+                >
+                  Resultado Neto
+                </span>
               </div>
-              <p className={`text-xl font-bold ${totals.netResult >= 0 ? 'text-blue-700' : 'text-orange-700'}`}>
+              <p
+                className={`text-xl font-bold ${totals.netResult >= 0 ? 'text-blue-700' : 'text-orange-700'}`}
+              >
                 {formatCurrency(totals.netResult)}
               </p>
             </div>
@@ -234,7 +329,10 @@ export default function ReportModal({ onClose, balanceId, balances, onReportSave
               <h3 className="text-sm font-bold text-green-700 flex items-center gap-1.5">
                 <TrendingUp size={15} /> Ingresos ({incomeItems.length})
               </h3>
-              <button onClick={() => addItem('ingreso')} className="flex items-center gap-1 text-xs text-secondary hover:text-secondary/80 font-medium">
+              <button
+                onClick={() => addItem('ingreso')}
+                className="flex items-center gap-1 text-xs text-secondary hover:text-secondary/80 font-medium"
+              >
                 <Plus size={14} /> Agregar
               </button>
             </div>
@@ -243,41 +341,78 @@ export default function ReportModal({ onClose, balanceId, balances, onReportSave
                 <table className="w-full">
                   <thead>
                     <tr className="bg-green-50 border-b border-neutral-border">
-                      <th className="py-2.5 px-3 text-xs text-green-700 font-medium text-left">Concepto</th>
-                      <th className="py-2.5 px-3 text-xs text-green-700 font-medium text-left">Subcategoría</th>
-                      <th className="py-2.5 px-3 text-xs text-green-700 font-medium text-right">Monto</th>
+                      <th className="py-2.5 px-3 text-xs text-green-700 font-medium text-left">
+                        Concepto
+                      </th>
+                      <th className="py-2.5 px-3 text-xs text-green-700 font-medium text-left">
+                        Subcategoría
+                      </th>
+                      <th className="py-2.5 px-3 text-xs text-green-700 font-medium text-right">
+                        Monto
+                      </th>
                       <th className="py-2.5 px-3 w-10"></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {items.map((item, idx) =>
-                      item.category === 'ingreso' && (
-                        <tr key={idx} className="border-b border-neutral-border last:border-b-0 hover:bg-neutral-bg/50">
-                          <td className="py-2 px-3">
-                            <input type="text" value={item.concept} onChange={(e) => updateItem(idx, 'concept', e.target.value)}
-                              className="w-full px-2 py-1 rounded-lg border border-transparent hover:border-neutral-border focus:border-secondary bg-transparent text-sm text-neutral-text focus:outline-none" />
-                          </td>
-                          <td className="py-2 px-3">
-                            <input type="text" value={item.subcategory} onChange={(e) => updateItem(idx, 'subcategory', e.target.value)}
-                              className="w-full px-2 py-1 rounded-lg border border-transparent hover:border-neutral-border focus:border-secondary bg-transparent text-sm text-neutral-text focus:outline-none" />
-                          </td>
-                          <td className="py-2 px-3">
-                            <input type="number" value={item.amount} onChange={(e) => updateItem(idx, 'amount', Number(e.target.value))}
-                              className="w-full px-2 py-1 rounded-lg border border-transparent hover:border-neutral-border focus:border-secondary bg-transparent text-sm text-neutral-text focus:outline-none text-right" />
-                          </td>
-                          <td className="py-2 px-1">
-                            <button onClick={() => removeItem(idx)} className="p-1 rounded-lg text-red-400 hover:bg-red-50 transition-colors">
-                              <Trash2 size={14} />
-                            </button>
-                          </td>
-                        </tr>
-                      )
+                    {items.map(
+                      (item, idx) =>
+                        item.category === 'ingreso' && (
+                          <tr
+                            key={idx}
+                            className="border-b border-neutral-border last:border-b-0 hover:bg-neutral-bg/50"
+                          >
+                            <td className="py-2 px-3">
+                              <input
+                                type="text"
+                                value={item.concept}
+                                onChange={(e) =>
+                                  updateItem(idx, 'concept', e.target.value)
+                                }
+                                className="w-full px-2 py-1 rounded-lg border border-transparent hover:border-neutral-border focus:border-secondary bg-transparent text-sm text-neutral-text focus:outline-none"
+                              />
+                            </td>
+                            <td className="py-2 px-3">
+                              <input
+                                type="text"
+                                value={item.subcategory}
+                                onChange={(e) =>
+                                  updateItem(idx, 'subcategory', e.target.value)
+                                }
+                                className="w-full px-2 py-1 rounded-lg border border-transparent hover:border-neutral-border focus:border-secondary bg-transparent text-sm text-neutral-text focus:outline-none"
+                              />
+                            </td>
+                            <td className="py-2 px-3">
+                              <input
+                                type="number"
+                                value={item.amount}
+                                onChange={(e) =>
+                                  updateItem(
+                                    idx,
+                                    'amount',
+                                    Number(e.target.value)
+                                  )
+                                }
+                                className="w-full px-2 py-1 rounded-lg border border-transparent hover:border-neutral-border focus:border-secondary bg-transparent text-sm text-neutral-text focus:outline-none text-right"
+                              />
+                            </td>
+                            <td className="py-2 px-1">
+                              <button
+                                onClick={() => removeItem(idx)}
+                                className="p-1 rounded-lg text-red-400 hover:bg-red-50 transition-colors"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </td>
+                          </tr>
+                        )
                     )}
                   </tbody>
                 </table>
               </div>
             ) : (
-              <p className="text-xs text-neutral-muted py-4 text-center border border-dashed border-neutral-border rounded-xl">No hay ingresos clasificados.</p>
+              <p className="text-xs text-neutral-muted py-4 text-center border border-dashed border-neutral-border rounded-xl">
+                No hay ingresos clasificados.
+              </p>
             )}
           </div>
 
@@ -286,7 +421,10 @@ export default function ReportModal({ onClose, balanceId, balances, onReportSave
               <h3 className="text-sm font-bold text-red-600 flex items-center gap-1.5">
                 <TrendingDown size={15} /> Gastos ({expenseItems.length})
               </h3>
-              <button onClick={() => addItem('gasto')} className="flex items-center gap-1 text-xs text-secondary hover:text-secondary/80 font-medium">
+              <button
+                onClick={() => addItem('gasto')}
+                className="flex items-center gap-1 text-xs text-secondary hover:text-secondary/80 font-medium"
+              >
                 <Plus size={14} /> Agregar
               </button>
             </div>
@@ -295,51 +433,92 @@ export default function ReportModal({ onClose, balanceId, balances, onReportSave
                 <table className="w-full">
                   <thead>
                     <tr className="bg-red-50 border-b border-neutral-border">
-                      <th className="py-2.5 px-3 text-xs text-red-700 font-medium text-left">Concepto</th>
-                      <th className="py-2.5 px-3 text-xs text-red-700 font-medium text-left">Subcategoría</th>
-                      <th className="py-2.5 px-3 text-xs text-red-700 font-medium text-right">Monto</th>
+                      <th className="py-2.5 px-3 text-xs text-red-700 font-medium text-left">
+                        Concepto
+                      </th>
+                      <th className="py-2.5 px-3 text-xs text-red-700 font-medium text-left">
+                        Subcategoría
+                      </th>
+                      <th className="py-2.5 px-3 text-xs text-red-700 font-medium text-right">
+                        Monto
+                      </th>
                       <th className="py-2.5 px-3 w-10"></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {items.map((item, idx) =>
-                      item.category === 'gasto' && (
-                        <tr key={idx} className="border-b border-neutral-border last:border-b-0 hover:bg-neutral-bg/50">
-                          <td className="py-2 px-3">
-                            <input type="text" value={item.concept} onChange={(e) => updateItem(idx, 'concept', e.target.value)}
-                              className="w-full px-2 py-1 rounded-lg border border-transparent hover:border-neutral-border focus:border-secondary bg-transparent text-sm text-neutral-text focus:outline-none" />
-                          </td>
-                          <td className="py-2 px-3">
-                            <input type="text" value={item.subcategory} onChange={(e) => updateItem(idx, 'subcategory', e.target.value)}
-                              className="w-full px-2 py-1 rounded-lg border border-transparent hover:border-neutral-border focus:border-secondary bg-transparent text-sm text-neutral-text focus:outline-none" />
-                          </td>
-                          <td className="py-2 px-3">
-                            <input type="number" value={item.amount} onChange={(e) => updateItem(idx, 'amount', Number(e.target.value))}
-                              className="w-full px-2 py-1 rounded-lg border border-transparent hover:border-neutral-border focus:border-secondary bg-transparent text-sm text-neutral-text focus:outline-none text-right" />
-                          </td>
-                          <td className="py-2 px-1">
-                            <button onClick={() => removeItem(idx)} className="p-1 rounded-lg text-red-400 hover:bg-red-50 transition-colors">
-                              <Trash2 size={14} />
-                            </button>
-                          </td>
-                        </tr>
-                      )
+                    {items.map(
+                      (item, idx) =>
+                        item.category === 'gasto' && (
+                          <tr
+                            key={idx}
+                            className="border-b border-neutral-border last:border-b-0 hover:bg-neutral-bg/50"
+                          >
+                            <td className="py-2 px-3">
+                              <input
+                                type="text"
+                                value={item.concept}
+                                onChange={(e) =>
+                                  updateItem(idx, 'concept', e.target.value)
+                                }
+                                className="w-full px-2 py-1 rounded-lg border border-transparent hover:border-neutral-border focus:border-secondary bg-transparent text-sm text-neutral-text focus:outline-none"
+                              />
+                            </td>
+                            <td className="py-2 px-3">
+                              <input
+                                type="text"
+                                value={item.subcategory}
+                                onChange={(e) =>
+                                  updateItem(idx, 'subcategory', e.target.value)
+                                }
+                                className="w-full px-2 py-1 rounded-lg border border-transparent hover:border-neutral-border focus:border-secondary bg-transparent text-sm text-neutral-text focus:outline-none"
+                              />
+                            </td>
+                            <td className="py-2 px-3">
+                              <input
+                                type="number"
+                                value={item.amount}
+                                onChange={(e) =>
+                                  updateItem(
+                                    idx,
+                                    'amount',
+                                    Number(e.target.value)
+                                  )
+                                }
+                                className="w-full px-2 py-1 rounded-lg border border-transparent hover:border-neutral-border focus:border-secondary bg-transparent text-sm text-neutral-text focus:outline-none text-right"
+                              />
+                            </td>
+                            <td className="py-2 px-1">
+                              <button
+                                onClick={() => removeItem(idx)}
+                                className="p-1 rounded-lg text-red-400 hover:bg-red-50 transition-colors"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </td>
+                          </tr>
+                        )
                     )}
                   </tbody>
                 </table>
               </div>
             ) : (
-              <p className="text-xs text-neutral-muted py-4 text-center border border-dashed border-neutral-border rounded-xl">No hay gastos clasificados.</p>
+              <p className="text-xs text-neutral-muted py-4 text-center border border-dashed border-neutral-border rounded-xl">
+                No hay gastos clasificados.
+              </p>
             )}
           </div>
         </div>
 
         <div className="flex items-center justify-between px-6 py-4 border-t border-neutral-border flex-shrink-0">
           <p className="text-xs text-neutral-muted">
-            Puedes editar cualquier campo antes de exportar. El reporte se guardará automáticamente.
+            Puedes editar cualquier campo antes de exportar. El reporte se
+            guardará automáticamente.
           </p>
           <div className="flex gap-3">
-            <button onClick={onClose} className="px-4 py-2 rounded-lg border border-neutral-border text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg border border-neutral-border text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200"
+            >
               Cancelar
             </button>
             <button

@@ -100,7 +100,9 @@ export default function ReportesPage() {
         </div>
         <div className="flex items-center gap-2 bg-secondary/10 border border-secondary/20 rounded-xl px-3 py-2">
           <Sparkles size={14} className="text-secondary" />
-          <span className="text-xs text-secondary font-medium">Generados con IA</span>
+          <span className="text-xs text-secondary font-medium">
+            Generados con IA
+          </span>
         </div>
       </div>
 
@@ -129,14 +131,16 @@ export default function ReportesPage() {
               No hay reportes guardados
             </p>
             <p className="text-xs text-neutral-muted">
-              Los reportes que generes con IA desde Family Office aparecerán aquí automáticamente al exportarlos.
+              Los reportes que generes con IA desde Family Office aparecerán
+              aquí automáticamente al exportarlos.
             </p>
           </div>
         ) : (
           <>
             <div className="flex items-center justify-between mb-4">
               <p className="text-xs text-neutral-muted">
-                {reports.length} {reports.length === 1 ? 'reporte' : 'reportes'} · {filteredLabel}
+                {reports.length} {reports.length === 1 ? 'reporte' : 'reportes'}{' '}
+                · {filteredLabel}
               </p>
             </div>
 
@@ -164,7 +168,9 @@ export default function ReportesPage() {
                     <div className="bg-green-50 border border-green-100 rounded-xl p-2.5">
                       <div className="flex items-center gap-1 mb-1">
                         <TrendingUp size={11} className="text-green-600" />
-                        <span className="text-[10px] text-green-700 font-medium">Ingresos</span>
+                        <span className="text-[10px] text-green-700 font-medium">
+                          Ingresos
+                        </span>
                       </div>
                       <p className="text-xs font-bold text-green-700 truncate">
                         {formatCurrency(report.total_income)}
@@ -173,20 +179,35 @@ export default function ReportesPage() {
                     <div className="bg-red-50 border border-red-100 rounded-xl p-2.5">
                       <div className="flex items-center gap-1 mb-1">
                         <TrendingDown size={11} className="text-red-500" />
-                        <span className="text-[10px] text-red-700 font-medium">Gastos</span>
+                        <span className="text-[10px] text-red-700 font-medium">
+                          Gastos
+                        </span>
                       </div>
                       <p className="text-xs font-bold text-red-600 truncate">
                         {formatCurrency(report.total_expenses)}
                       </p>
                     </div>
-                    <div className={`border rounded-xl p-2.5 ${report.net_result >= 0 ? 'bg-blue-50 border-blue-100' : 'bg-orange-50 border-orange-100'}`}>
+                    <div
+                      className={`border rounded-xl p-2.5 ${report.net_result >= 0 ? 'bg-blue-50 border-blue-100' : 'bg-orange-50 border-orange-100'}`}
+                    >
                       <div className="flex items-center gap-1 mb-1">
-                        <DollarSign size={11} className={report.net_result >= 0 ? 'text-blue-600' : 'text-orange-500'} />
-                        <span className={`text-[10px] font-medium ${report.net_result >= 0 ? 'text-blue-700' : 'text-orange-700'}`}>
+                        <DollarSign
+                          size={11}
+                          className={
+                            report.net_result >= 0
+                              ? 'text-blue-600'
+                              : 'text-orange-500'
+                          }
+                        />
+                        <span
+                          className={`text-[10px] font-medium ${report.net_result >= 0 ? 'text-blue-700' : 'text-orange-700'}`}
+                        >
                           Neto
                         </span>
                       </div>
-                      <p className={`text-xs font-bold truncate ${report.net_result >= 0 ? 'text-blue-700' : 'text-orange-600'}`}>
+                      <p
+                        className={`text-xs font-bold truncate ${report.net_result >= 0 ? 'text-blue-700' : 'text-orange-600'}`}
+                      >
                         {formatCurrency(report.net_result)}
                       </p>
                     </div>
@@ -205,7 +226,9 @@ export default function ReportesPage() {
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-medium hover:bg-primary-hover transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-primary/20"
                     >
                       <FileDown size={13} />
-                      {downloadingId === report.id ? 'Descargando...' : 'Descargar PDF'}
+                      {downloadingId === report.id
+                        ? 'Descargando...'
+                        : 'Descargar PDF'}
                     </button>
                     <button
                       onClick={() => setConfirmDelete(report.id)}
@@ -230,12 +253,17 @@ export default function ReportesPage() {
                 <Trash2 size={18} className="text-red-400" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-neutral-text">Eliminar reporte</h3>
-                <p className="text-xs text-neutral-muted">Esta acción no se puede deshacer</p>
+                <h3 className="text-base font-bold text-neutral-text">
+                  Eliminar reporte
+                </h3>
+                <p className="text-xs text-neutral-muted">
+                  Esta acción no se puede deshacer
+                </p>
               </div>
             </div>
             <p className="text-sm text-neutral-text mb-6">
-              ¿Seguro que deseas eliminar este reporte? El PDF también se eliminará de los archivos.
+              ¿Seguro que deseas eliminar este reporte? El PDF también se
+              eliminará de los archivos.
             </p>
             <div className="flex gap-3">
               <button
