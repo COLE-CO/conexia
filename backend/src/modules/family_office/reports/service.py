@@ -1,30 +1,27 @@
 import io
+import uuid
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from src.modules.family_office.balances import service as balance_service
-from src.modules.family_office.balances.storage import get_s3_client
+from src.modules.family_office.balances.storage import (
+    get_s3_client,
+    generate_presigned_download_url,
+)
 from src.modules.family_office.companies import service as company_service
+from src.core.config import settings
 
 from . import schemas
 from .ai_classifier import classify_balance
 from .extractor import extract_balance_content
+from .model import SavedReport
 from .pdf_generator import generate_report_pdf
 
 MONTH_NAMES = {
-    1: "Enero",
-    2: "Febrero",
-    3: "Marzo",
-    4: "Abril",
-    5: "Mayo",
-    6: "Junio",
-    7: "Julio",
-    8: "Agosto",
-    9: "Septiembre",
-    10: "Octubre",
-    11: "Noviembre",
-    12: "Diciembre",
+    1: "Enero", 2: "Febrero", 3: "Marzo", 4: "Abril",
+    5: "Mayo", 6: "Junio", 7: "Julio", 8: "Agosto",
+    9: "Septiembre", 10: "Octubre", 11: "Noviembre", 12: "Diciembre",
 }
 
 
@@ -36,10 +33,24 @@ def _build_period(year: int, month: int | None) -> str:
 
 def _download_from_s3(storage_key: str) -> bytes:
     s3 = get_s3_client()
-    from src.core.config import settings
-
     response = s3.get_object(Bucket=settings.AWS_BUCKET_NAME, Key=storage_key)
     return response["Body"].read()
+
+
+def _upload_pdf_to_s3(pdf_buffer: io.BytesIO, storage_key: str) -> None:
+    s3 = get_s3_client()
+    pdf_buffer.seek(0)
+    s3.upload_fileobj(
+        pdf_buffer,
+        settings.AWS_BUCKET_NAME,
+        storage_key,
+        ExtraArgs={"ContentType": "application/pdf"},
+    )
+
+
+def _delete_from_s3(storage_key: str) -> None:
+    s3 = get_s3_client()
+    s3.delete_object(Bucket=settings.AWS_BUCKET_NAME, Key=storage_key)
 
 
 def generate_ai_report(db: Session, balance_id: int) -> schemas.ReportData:
@@ -60,10 +71,7 @@ def generate_ai_report(db: Session, balance_id: int) -> schemas.ReportData:
     company_name = company.name
     period = _build_period(balance.year, balance.month)
 
-    # Download file from S3
     file_bytes = _download_from_s3(balance.storage_key)
-
-    # Extract content
     extracted_text = extract_balance_content(file_bytes, balance.file_type)
     if not extracted_text.strip():
         raise HTTPException(
@@ -71,7 +79,6 @@ def generate_ai_report(db: Session, balance_id: int) -> schemas.ReportData:
             detail="El balance no contiene datos que se puedan analizar.",
         )
 
-    # Classify with AI
     try:
         ai_result = classify_balance(extracted_text, company_name, period)
     except Exception as err:
@@ -95,3 +102,79 @@ def generate_ai_report(db: Session, balance_id: int) -> schemas.ReportData:
 
 def generate_pdf(data: schemas.GeneratePDFRequest) -> io.BytesIO:
     return generate_report_pdf(data)
+
+
+def save_report(db: Session, data: schemas.SaveReportRequest) -> SavedReport:
+    # Generar y subir PDF a S3
+    pdf_request = schemas.GeneratePDFRequest(
+        company_name=data.company_name,
+        company_nit=data.company_nit,
+        period=data.period,
+        items=data.items,
+        total_income=data.total_income,
+        total_expenses=data.total_expenses,
+        net_result=data.net_result,
+        ai_summary=data.ai_summary,
+    )
+    pdf_buffer = generate_report_pdf(pdf_request)
+
+    safe_company = data.company_name.replace(" ", "_")
+    safe_period = data.period.replace(" ", "_")
+    pdf_filename = f"reporte_{safe_company}_{safe_period}.pdf"
+    storage_key = f"reports/{data.company_id}/{uuid.uuid4()}/{pdf_filename}"
+
+    _upload_pdf_to_s3(pdf_buffer, storage_key)
+
+    report = SavedReport(
+        company_id=data.company_id,
+        balance_id=data.balance_id,
+        company_name=data.company_name,
+        period=data.period,
+        ai_summary=data.ai_summary,
+        total_income=data.total_income,
+        total_expenses=data.total_expenses,
+        net_result=data.net_result,
+        storage_key=storage_key,
+        pdf_filename=pdf_filename,
+    )
+    db.add(report)
+    db.commit()
+    db.refresh(report)
+    return report
+
+
+def get_saved_reports_by_company(db: Session, company_id: int) -> list[SavedReport]:
+    return (
+        db.query(SavedReport)
+        .filter(SavedReport.company_id == company_id)
+        .order_by(SavedReport.created_at.desc())
+        .all()
+    )
+
+
+def get_report_download_url(db: Session, report_id: int) -> str:
+    report = db.query(SavedReport).filter(SavedReport.id == report_id).first()
+    if not report:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Reporte no encontrado",
+        )
+    return generate_presigned_download_url(report.storage_key, report.pdf_filename)
+
+
+def delete_saved_report(db: Session, report_id: int) -> SavedReport | None:
+    report = db.query(SavedReport).filter(SavedReport.id == report_id).first()
+    if not report:
+        return None
+    _delete_from_s3(report.storage_key)
+    db.delete(report)
+    db.commit()
+    return report
+
+
+def get_all_saved_reports(db: Session) -> list[SavedReport]:
+    return (
+        db.query(SavedReport)
+        .order_by(SavedReport.created_at.desc())
+        .all()
+    )
