@@ -18,11 +18,10 @@ import {
   TrendingDown,
   DollarSign,
   Sparkles,
-  ArrowLeft,
 } from 'lucide-react';
 
 export default function ReportesPage() {
-  const { activeCompany, clearActiveCompany } = useCompany();
+  const { activeCompany } = useCompany();
   const [reports, setReports] = useState<SavedReport[]>([]);
   const [loading, setLoading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
