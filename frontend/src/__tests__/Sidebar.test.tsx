@@ -49,11 +49,11 @@ describe('Sidebar', () => {
 
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.queryByText('Family Office')).not.toBeInTheDocument();
-    expect(screen.queryByText('Flujo de Caja')).not.toBeInTheDocument();
+    expect(screen.getByText('Flujo de Caja')).toBeInTheDocument();
     expect(screen.queryByText('Notificaciones')).not.toBeInTheDocument();
   });
 
-  it('muestra flujo de caja solo al administrador', () => {
+  it('muestra flujo de caja al administrador', () => {
     renderSidebar({
       ...baseUser,
       role: 'admin',
