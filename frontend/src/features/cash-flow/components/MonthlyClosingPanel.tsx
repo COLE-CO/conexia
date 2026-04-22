@@ -97,7 +97,7 @@ export default function MonthlyClosingPanel({
               htmlFor="closing-year"
               className="block text-xs font-semibold text-neutral-muted mb-1"
             >
-              Ano
+              Año
             </label>
             <input
               id="closing-year"
