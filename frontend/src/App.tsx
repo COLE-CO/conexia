@@ -7,6 +7,7 @@ import { SidebarProvider } from './context/SidebarContext';
 import Sidebar from './components/Sidebar';
 import CompanyGuard from './components/CompanyGuard';
 import FamilyOfficePage from './pages/FamilyOfficePage';
+import ReportesPage from './pages/ReportesPage';
 import React from 'react';
 import SettingsPage from './pages/SettingsPage';
 import NotificationsPage from './pages/NotificationsPage';
@@ -86,7 +87,7 @@ function App() {
           element={
             <ProtectedRoute>
               <LayoutWithSidebar>
-                <h1 className="p-6">Reportes</h1>
+                <ReportesPage />
               </LayoutWithSidebar>
             </ProtectedRoute>
           }

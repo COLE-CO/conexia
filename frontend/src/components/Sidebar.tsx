@@ -33,19 +33,19 @@ const mainItems = [
     label: 'Flujo de Caja',
     icon: ArrowLeftRight,
     path: '/flujo-de-caja',
-    roles: ['admin', 'contador_family_office', 'contador_cole_co'],
+    roles: ['admin', 'contador_cole_co'],
   },
   {
     label: 'Facturas',
     icon: FileText,
     path: '/facturas',
-    roles: ['admin', 'contador_family_office', 'contador_cole_co'],
+    roles: ['admin', 'contador_cole_co'],
   },
   {
     label: 'Reportes',
     icon: BarChart2,
     path: '/reportes',
-    roles: ['admin', 'contador_family_office', 'contador_cole_co'],
+    roles: ['admin', 'contador_family_office'],
   },
 ];
 

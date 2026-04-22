@@ -12,8 +12,13 @@ import {
   DollarSign,
   Pencil,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import type { Balance } from '../services/balanceService';
-import { generateReport, exportReportPDF } from '../services/reportService';
+import {
+  generateReport,
+  exportReportPDF,
+  saveReport,
+} from '../services/reportService';
 import type { LineItem, ReportData } from '../services/reportService';
 import { useCompany } from '../context/CompanyContext';
 
@@ -21,31 +26,37 @@ interface Props {
   onClose: () => void;
   balanceId?: number;
   balances: Balance[];
+  onReportSaved?: () => void;
 }
 
 type Step = 'select' | 'loading' | 'ready';
 
-export default function ReportModal({ onClose, balanceId, balances }: Props) {
+export default function ReportModal({
+  onClose,
+  balanceId,
+  balances,
+  onReportSaved,
+}: Props) {
   const { activeCompany } = useCompany();
   const [step, setStep] = useState<Step>(balanceId ? 'loading' : 'select');
   const [error, setError] = useState<string | null>(null);
+  const [selectedBalanceId, setSelectedBalanceId] = useState<number | null>(
+    balanceId ?? null
+  );
 
-  // Report data state
   const [items, setItems] = useState<LineItem[]>([]);
   const [aiSummary, setAiSummary] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [period, setPeriod] = useState('');
-
-  // PDF export state
   const [exporting, setExporting] = useState(false);
 
   const totals = useMemo(() => {
     const totalIncome = items
       .filter((i) => i.category === 'ingreso')
-      .reduce((sum, i) => sum + i.amount, 0);
+      .reduce((s, i) => s + i.amount, 0);
     const totalExpenses = items
       .filter((i) => i.category === 'gasto')
-      .reduce((sum, i) => sum + i.amount, 0);
+      .reduce((s, i) => s + i.amount, 0);
     return {
       totalIncome,
       totalExpenses,
@@ -62,12 +73,12 @@ export default function ReportModal({ onClose, balanceId, balances }: Props) {
     [items]
   );
 
-  const handleGenerate = async (selectedBalanceId: number) => {
+  const handleGenerate = async (id: number) => {
+    setSelectedBalanceId(id);
     setStep('loading');
     setError(null);
-
     try {
-      const data: ReportData = await generateReport(selectedBalanceId);
+      const data: ReportData = await generateReport(id);
       setItems(data.items);
       setAiSummary(data.ai_summary);
       setCompanyName(data.company_name);
@@ -81,16 +92,14 @@ export default function ReportModal({ onClose, balanceId, balances }: Props) {
     }
   };
 
-  // Auto-generate if balanceId was provided
   useEffect(() => {
-    if (balanceId) {
-      handleGenerate(balanceId);
-    }
+    if (balanceId) handleGenerate(balanceId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleExportPDF = async () => {
     setExporting(true);
+    setError(null);
     try {
       await exportReportPDF({
         company_name: companyName,
@@ -102,8 +111,28 @@ export default function ReportModal({ onClose, balanceId, balances }: Props) {
         net_result: totals.netResult,
         ai_summary: aiSummary,
       });
+
+      if (activeCompany) {
+        await saveReport({
+          company_id: activeCompany.id,
+          balance_id: selectedBalanceId ?? undefined,
+          company_name: companyName,
+          company_nit: activeCompany.nit,
+          period,
+          ai_summary: aiSummary,
+          total_income: totals.totalIncome,
+          total_expenses: totals.totalExpenses,
+          net_result: totals.netResult,
+          items,
+        });
+        toast.success('Reporte guardado correctamente', {
+          description: `${companyName} · ${period}`,
+        });
+        onReportSaved?.();
+      }
     } catch {
       setError('Error al generar el PDF. Intenta de nuevo.');
+      toast.error('Error al exportar el PDF');
     } finally {
       setExporting(false);
     }
@@ -118,22 +147,17 @@ export default function ReportModal({ onClose, balanceId, balances }: Props) {
       prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
     );
   };
-
-  const removeItem = (index: number) => {
+  const removeItem = (index: number) =>
     setItems((prev) => prev.filter((_, i) => i !== index));
-  };
-
   const addItem = (category: 'ingreso' | 'gasto') => {
     setItems((prev) => [
       ...prev,
       { concept: '', amount: 0, category, subcategory: '' },
     ]);
   };
-
   const formatCurrency = (value: number) =>
     `$ ${value.toLocaleString('es-CO', { minimumFractionDigits: 0 })}`;
 
-  // --- STEP: Select balance ---
   if (step === 'select') {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -149,13 +173,10 @@ export default function ReportModal({ onClose, balanceId, balances }: Props) {
               <X size={20} />
             </button>
           </div>
-
           <p className="text-sm text-neutral-muted mb-4">
             Selecciona un balance para analizar con inteligencia artificial.
           </p>
-
           {error && <p className="text-xs text-red-400 mb-4">{error}</p>}
-
           {balances.length === 0 ? (
             <div className="text-center py-8">
               <div className="w-12 h-12 rounded-xl bg-neutral-bg border border-neutral-border flex items-center justify-center mx-auto mb-3">
@@ -194,7 +215,6 @@ export default function ReportModal({ onClose, balanceId, balances }: Props) {
               ))}
             </div>
           )}
-
           <button
             onClick={onClose}
             className="w-full px-4 py-2 rounded-lg border border-neutral-border text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200"
@@ -206,7 +226,6 @@ export default function ReportModal({ onClose, balanceId, balances }: Props) {
     );
   }
 
-  // --- STEP: Loading (AI processing) ---
   if (step === 'loading') {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -225,11 +244,9 @@ export default function ReportModal({ onClose, balanceId, balances }: Props) {
     );
   }
 
-  // --- STEP: Ready (editable results) ---
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="bg-neutral-surface border border-neutral-border rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col">
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-border flex-shrink-0">
           <div>
             <h2 className="text-lg font-bold text-neutral-text font-hubot">
@@ -245,11 +262,9 @@ export default function ReportModal({ onClose, balanceId, balances }: Props) {
           </button>
         </div>
 
-        {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
           {error && <p className="text-xs text-red-400">{error}</p>}
 
-          {/* Summary cards */}
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-green-50 border border-green-200 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-1">
@@ -274,11 +289,7 @@ export default function ReportModal({ onClose, balanceId, balances }: Props) {
               </p>
             </div>
             <div
-              className={`border rounded-xl p-4 ${
-                totals.netResult >= 0
-                  ? 'bg-blue-50 border-blue-200'
-                  : 'bg-orange-50 border-orange-200'
-              }`}
+              className={`border rounded-xl p-4 ${totals.netResult >= 0 ? 'bg-blue-50 border-blue-200' : 'bg-orange-50 border-orange-200'}`}
             >
               <div className="flex items-center gap-2 mb-1">
                 <DollarSign
@@ -288,24 +299,19 @@ export default function ReportModal({ onClose, balanceId, balances }: Props) {
                   }
                 />
                 <span
-                  className={`text-xs font-medium ${
-                    totals.netResult >= 0 ? 'text-blue-700' : 'text-orange-700'
-                  }`}
+                  className={`text-xs font-medium ${totals.netResult >= 0 ? 'text-blue-700' : 'text-orange-700'}`}
                 >
                   Resultado Neto
                 </span>
               </div>
               <p
-                className={`text-xl font-bold ${
-                  totals.netResult >= 0 ? 'text-blue-700' : 'text-orange-700'
-                }`}
+                className={`text-xl font-bold ${totals.netResult >= 0 ? 'text-blue-700' : 'text-orange-700'}`}
               >
                 {formatCurrency(totals.netResult)}
               </p>
             </div>
           </div>
 
-          {/* AI Summary */}
           <div>
             <label className="flex items-center gap-1.5 text-xs text-neutral-muted mb-2 font-medium">
               <Pencil size={13} /> Resumen del análisis (editable)
@@ -318,7 +324,6 @@ export default function ReportModal({ onClose, balanceId, balances }: Props) {
             />
           </div>
 
-          {/* Income table */}
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-bold text-green-700 flex items-center gap-1.5">
@@ -411,7 +416,6 @@ export default function ReportModal({ onClose, balanceId, balances }: Props) {
             )}
           </div>
 
-          {/* Expenses table */}
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-bold text-red-600 flex items-center gap-1.5">
@@ -505,10 +509,10 @@ export default function ReportModal({ onClose, balanceId, balances }: Props) {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-neutral-border flex-shrink-0">
           <p className="text-xs text-neutral-muted">
-            Puedes editar cualquier campo antes de exportar.
+            Puedes editar cualquier campo antes de exportar. El reporte se
+            guardará automáticamente.
           </p>
           <div className="flex gap-3">
             <button
@@ -523,7 +527,7 @@ export default function ReportModal({ onClose, balanceId, balances }: Props) {
               className="flex items-center gap-2 px-5 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-hover transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-primary/20"
             >
               <FileDown size={16} />
-              {exporting ? 'Generando PDF...' : 'Exportar PDF'}
+              {exporting ? 'Guardando...' : 'Exportar PDF'}
             </button>
           </div>
         </div>
