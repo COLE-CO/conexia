@@ -17,6 +17,8 @@ type AlertKey =
   | 'alert_balances_enabled'
   | 'alert_reports_enabled';
 
+type AlertPreferences = Record<AlertKey, boolean>;
+
 const alertOptions: Array<{
   key: AlertKey;
   title: string;
@@ -46,10 +48,15 @@ const alertOptions: Array<{
 ];
 
 export default function SettingsPage() {
-  const { user, patchUser, setUser, refreshUser } = useContext(AuthContext);
+  const { user, setUser, refreshUser } = useContext(AuthContext);
   const isAdmin = user?.role === 'admin';
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [alertPreferences, setAlertPreferences] = useState<AlertPreferences>({
+    alert_deadlines_enabled: false,
+    alert_balances_enabled: false,
+    alert_reports_enabled: false,
+  });
   const [reminderStartDays, setReminderStartDays] = useState(5);
   const [reminderEndDays, setReminderEndDays] = useState(7);
   const [saving, setSaving] = useState(false);
@@ -60,6 +67,11 @@ export default function SettingsPage() {
     if (!user) return;
     setFullName(user.full_name ?? '');
     setEmail(user.email);
+    setAlertPreferences({
+      alert_deadlines_enabled: user.alert_deadlines_enabled,
+      alert_balances_enabled: user.alert_balances_enabled,
+      alert_reports_enabled: user.alert_reports_enabled,
+    });
     setReminderStartDays(user.reminder_window_start_days);
     setReminderEndDays(user.reminder_window_end_days);
   }, [user]);
@@ -67,7 +79,10 @@ export default function SettingsPage() {
   if (!user) return null;
 
   const handleToggleAlert = (key: AlertKey) => {
-    patchUser({ [key]: !user[key] });
+    setAlertPreferences((currentPreferences) => ({
+      ...currentPreferences,
+      [key]: !currentPreferences[key],
+    }));
     setMessage(null);
     setError(null);
   };
@@ -93,9 +108,9 @@ export default function SettingsPage() {
       const updatedUser = await updateMe({
         full_name: fullName.trim(),
         email: email.trim(),
-        alert_deadlines_enabled: user.alert_deadlines_enabled,
-        alert_balances_enabled: user.alert_balances_enabled,
-        alert_reports_enabled: user.alert_reports_enabled,
+        alert_deadlines_enabled: alertPreferences.alert_deadlines_enabled,
+        alert_balances_enabled: alertPreferences.alert_balances_enabled,
+        alert_reports_enabled: alertPreferences.alert_reports_enabled,
         reminder_window_start_days: isAdmin
           ? reminderStartDays
           : user.reminder_window_start_days,
@@ -229,14 +244,20 @@ export default function SettingsPage() {
                     <button
                       type="button"
                       onClick={() => handleToggleAlert(key)}
-                      aria-label={`Alternar ${title}`}
-                      className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-200 ${
-                        user[key] ? 'bg-secondary' : 'bg-neutral-border'
+                      role="switch"
+                      aria-label={title}
+                      aria-checked={alertPreferences[key]}
+                      className={`relative mt-1 inline-flex h-8 w-14 flex-shrink-0 items-center rounded-full border border-transparent transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-secondary/30 ${
+                        alertPreferences[key]
+                          ? 'bg-secondary shadow-sm shadow-secondary/20'
+                          : 'bg-neutral-border'
                       }`}
                     >
                       <span
-                        className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-200 ${
-                          user[key] ? 'translate-x-6' : 'translate-x-1'
+                        className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                          alertPreferences[key]
+                            ? 'translate-x-7'
+                            : 'translate-x-1'
                         }`}
                       />
                     </button>

@@ -1,13 +1,19 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { BellOff, CalendarClock, CheckCircle2, BellRing } from 'lucide-react';
+import {
+  BellOff,
+  CalendarClock,
+  CheckCircle2,
+  BellRing,
+  FileSpreadsheet,
+  Sparkles,
+} from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import { useCompany } from '../context/CompanyContext';
 import { useNotifications } from '../hooks/useNotifications';
 import { getCompanies } from '../services/companyService';
 import type { Company } from '../services/companyService';
 import NotificationsPageSkeleton from '../features/notifications/components/NotificationsPageSkeleton';
-
-const NOTIFICATIONS_ALLOWED_ROLES = ['admin', 'contador_family_office'];
+import { NOTIFICATIONS_ALLOWED_ROLES } from '../constants/authorization';
 
 const formatNotificationDate = (isoDate: string) => {
   const [year, month, day] = isoDate
@@ -27,7 +33,23 @@ const formatNotificationDate = (isoDate: string) => {
   }).format(parsedDate);
 };
 
-const getNotificationVisual = () => {
+const getNotificationVisual = (type: 'deadline' | 'balance' | 'report') => {
+  if (type === 'balance') {
+    return {
+      icon: FileSpreadsheet,
+      label: 'Balance',
+      tone: 'text-primary',
+    };
+  }
+
+  if (type === 'report') {
+    return {
+      icon: Sparkles,
+      label: 'Reporte',
+      tone: 'text-secondary',
+    };
+  }
+
   return {
     icon: CalendarClock,
     label: 'Vencimiento',
@@ -49,7 +71,10 @@ export default function NotificationsPage() {
   const hasNotificationsAccess =
     !!user?.role && NOTIFICATIONS_ALLOWED_ROLES.includes(user.role);
   const hasEnabledAlerts =
-    hasNotificationsAccess && !!user?.alert_deadlines_enabled;
+    hasNotificationsAccess &&
+    (!!user?.alert_deadlines_enabled ||
+      !!user?.alert_balances_enabled ||
+      !!user?.alert_reports_enabled);
 
   useEffect(() => {
     if (!hasEnabledAlerts) {
@@ -330,12 +355,12 @@ export default function NotificationsPage() {
                   </div>
                 ) : (
                   visibleNotifications.map((notification) => {
-                    const visual = getNotificationVisual();
+                    const visual = getNotificationVisual(notification.type);
                     const Icon = visual.icon;
-                    const titleWithoutPrefix = notification.title.replace(
-                      /^Vencimiento:\s*/,
-                      ''
-                    );
+                    const titleWithoutPrefix =
+                      notification.type === 'deadline'
+                        ? notification.title.replace(/^Vencimiento:\s*/, '')
+                        : notification.title;
 
                     return (
                       <article

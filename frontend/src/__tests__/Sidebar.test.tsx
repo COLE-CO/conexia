@@ -49,7 +49,17 @@ describe('Sidebar', () => {
 
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.queryByText('Family Office')).not.toBeInTheDocument();
+    expect(screen.getByText('Flujo de Caja')).toBeInTheDocument();
     expect(screen.queryByText('Notificaciones')).not.toBeInTheDocument();
+  });
+
+  it('muestra flujo de caja al administrador', () => {
+    renderSidebar({
+      ...baseUser,
+      role: 'admin',
+    });
+
+    expect(screen.getByText('Flujo de Caja')).toBeInTheDocument();
   });
 
   it('oculta notificaciones cuando todas las alertas estan desactivadas', () => {
@@ -61,6 +71,30 @@ describe('Sidebar', () => {
     });
 
     expect(screen.queryByText('Notificaciones')).not.toBeInTheDocument();
+  });
+
+  it('muestra notificaciones cuando solo alertas de balances estan activas', () => {
+    renderSidebar({
+      ...baseUser,
+      role: 'contador_family_office',
+      alert_deadlines_enabled: false,
+      alert_balances_enabled: true,
+      alert_reports_enabled: false,
+    });
+
+    expect(screen.getByText('Notificaciones')).toBeInTheDocument();
+  });
+
+  it('muestra notificaciones cuando solo alertas de reportes estan activas', () => {
+    renderSidebar({
+      ...baseUser,
+      role: 'contador_family_office',
+      alert_deadlines_enabled: false,
+      alert_balances_enabled: false,
+      alert_reports_enabled: true,
+    });
+
+    expect(screen.getByText('Notificaciones')).toBeInTheDocument();
   });
 
   it('permite minimizar la barra lateral', async () => {

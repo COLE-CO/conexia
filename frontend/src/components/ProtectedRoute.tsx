@@ -4,9 +4,10 @@ import { AuthContext } from '../context/AuthContext';
 
 interface Props {
   children: React.ReactNode;
+  allowedRoles?: readonly string[];
 }
 
-export const ProtectedRoute = ({ children }: Props) => {
+export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
   const { isAuthenticated, user, loading } = useContext(AuthContext);
   const location = useLocation();
 
@@ -29,6 +30,10 @@ export const ProtectedRoute = ({ children }: Props) => {
   }
 
   if (!user?.must_change_password && location.pathname === '/change-password') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  if (allowedRoles && (!user?.role || !allowedRoles.includes(user.role))) {
     return <Navigate to="/dashboard" replace />;
   }
 

@@ -1,6 +1,10 @@
 import { useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import {
+  CASH_FLOW_ALLOWED_ROLES,
+  NOTIFICATIONS_ALLOWED_ROLES,
+} from '../constants/authorization';
 import { useCompany } from '../context/CompanyContext';
 import { useSidebar } from '../context/SidebarContext';
 import {
@@ -33,7 +37,7 @@ const mainItems = [
     label: 'Flujo de Caja',
     icon: ArrowLeftRight,
     path: '/flujo-de-caja',
-    roles: ['admin', 'contador_cole_co'],
+    roles: [...CASH_FLOW_ALLOWED_ROLES],
   },
   {
     label: 'Facturas',
@@ -49,8 +53,6 @@ const mainItems = [
   },
 ];
 
-const NOTIFICATIONS_ALLOWED_ROLES = ['admin', 'contador_family_office'];
-
 export default function Sidebar() {
   const { isExpanded, toggle } = useSidebar();
   const { logout, user } = useContext(AuthContext);
@@ -59,7 +61,10 @@ export default function Sidebar() {
   const roleLabel = user?.role?.replaceAll('_', ' ');
   const hasNotificationsAccess =
     !!user?.role && NOTIFICATIONS_ALLOWED_ROLES.includes(user.role);
-  const hasEnabledAlerts = !!user?.alert_deadlines_enabled;
+  const hasEnabledAlerts =
+    !!user?.alert_deadlines_enabled ||
+    !!user?.alert_balances_enabled ||
+    !!user?.alert_reports_enabled;
   const canSeeNotifications = hasNotificationsAccess && hasEnabledAlerts;
 
   const handleLogout = () => {

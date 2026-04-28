@@ -21,6 +21,9 @@ import {
 } from '../services/reportService';
 import type { LineItem, ReportData } from '../services/reportService';
 import { useCompany } from '../context/CompanyContext';
+import { AuthContext } from '../context/AuthContext';
+import { useContext } from 'react';
+import { appendStoredNotificationEvent } from '../services/notificationEventService';
 
 interface Props {
   onClose: () => void;
@@ -38,6 +41,7 @@ export default function ReportModal({
   onReportSaved,
 }: Props) {
   const { activeCompany } = useCompany();
+  const { user } = useContext(AuthContext);
   const [step, setStep] = useState<Step>(balanceId ? 'loading' : 'select');
   const [error, setError] = useState<string | null>(null);
   const [selectedBalanceId, setSelectedBalanceId] = useState<number | null>(
@@ -83,6 +87,17 @@ export default function ReportModal({
       setAiSummary(data.ai_summary);
       setCompanyName(data.company_name);
       setPeriod(data.period);
+      if (user?.id) {
+        appendStoredNotificationEvent(user.id, {
+          id: `report-${selectedBalanceId}-${Date.now()}`,
+          type: 'report',
+          title: `Reporte generado: ${data.company_name}`,
+          message: `Se generó un resumen con IA para el periodo ${data.period}.`,
+          isoDate: new Date().toISOString(),
+          companyId: activeCompany?.id,
+          companyName: data.company_name,
+        });
+      }
       setStep('ready');
     } catch {
       setError(
