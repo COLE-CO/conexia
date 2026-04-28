@@ -43,13 +43,13 @@ const mainItems = [
     label: 'Facturas',
     icon: FileText,
     path: '/facturas',
-    roles: ['admin', 'contador_family_office', 'contador_cole_co'],
+    roles: ['admin', 'contador_cole_co'],
   },
   {
     label: 'Reportes',
     icon: BarChart2,
     path: '/reportes',
-    roles: ['admin', 'contador_family_office', 'contador_cole_co'],
+    roles: ['admin', 'contador_family_office'],
   },
 ];
 
