@@ -86,9 +86,9 @@ export default function PaymentsTable({
                     {currency.format(Number(payment.amount))}
                   </td>
                   <td className="px-4 py-3 text-neutral-muted whitespace-nowrap">
-                    {new Date(payment.due_date + 'T00:00:00').toLocaleDateString(
-                      'es-CO'
-                    )}
+                    {new Date(
+                      payment.due_date + 'T00:00:00'
+                    ).toLocaleDateString('es-CO')}
                   </td>
                   <td className="px-4 py-3">
                     <span

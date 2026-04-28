@@ -20,10 +20,7 @@ export const currency = new Intl.NumberFormat('es-CO', {
   maximumFractionDigits: 0,
 });
 
-export function getTrafficLight(
-  status: string,
-  dueDate: string
-): TrafficLight {
+export function getTrafficLight(status: string, dueDate: string): TrafficLight {
   if (status === 'pagado') return 'gray';
   const today = new Date();
   today.setHours(0, 0, 0, 0);

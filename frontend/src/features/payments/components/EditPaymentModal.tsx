@@ -72,9 +72,7 @@ export default function EditPaymentModal({
           </div>
 
           <div>
-            <label className="text-xs text-neutral-muted">
-              Fecha limite *
-            </label>
+            <label className="text-xs text-neutral-muted">Fecha limite *</label>
             <input
               type="date"
               value={editForm.due_date}

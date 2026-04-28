@@ -34,9 +34,7 @@ def create_payment(db: Session, payload: schemas.PaymentCreate):
 
 
 def _get_payment(db: Session, payment_id: int):
-    payment = (
-        db.query(models.Payment).filter(models.Payment.id == payment_id).first()
-    )
+    payment = db.query(models.Payment).filter(models.Payment.id == payment_id).first()
     if not payment:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
