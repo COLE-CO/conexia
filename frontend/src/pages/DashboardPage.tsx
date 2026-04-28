@@ -3,7 +3,6 @@ import { AuthContext } from '../context/AuthContext';
 import { useCompany } from '../context/CompanyContext';
 import { useNavigate } from 'react-router-dom';
 
-import ColeCoDashboard from '../features/dashboard/components/ColeCoDashboard';
 import ChartsRow from '../features/dashboard/components/ChartsRow';
 import DateRangeSelector from '../features/dashboard/components/DateRangeSelector';
 import DomainSwitcher from '../features/dashboard/components/DomainSwitcher';
@@ -11,6 +10,7 @@ import FamilyOfficeHeader from '../features/dashboard/components/FamilyOfficeHea
 import MetricsGrid from '../features/dashboard/components/MetricsGrid';
 import NoDashboardAccess from '../features/dashboard/components/NoDashboardAccess';
 import PriorityList from '../features/dashboard/components/PriorityList';
+import CashFlowDashboard from '../features/cash-flow/dashboard/components/CashFlowDashboard';
 import { useDashboardData } from '../features/dashboard/hooks/useDashboardData';
 import { useDashboardMetrics } from '../features/dashboard/hooks/useDashboardMetrics';
 import type {
@@ -52,6 +52,7 @@ const DashboardPage = () => {
 
   const canSeeColeCoDashboard =
     (isAdmin || isColeCoRole) && activeDashboardDomain === 'cole_co';
+
   const { deadlines, loading, error } = useDashboardData(
     canSeeFamilyOfficeDashboard
   );
@@ -83,14 +84,6 @@ const DashboardPage = () => {
           />
         )}
 
-        {canSeeColeCoDashboard && (
-          <ColeCoDashboard
-            currentDateText={currentDateText}
-            fullName={user?.full_name ?? undefined}
-            role={user?.role}
-          />
-        )}
-
         {canSeeFamilyOfficeDashboard && (
           <>
             <FamilyOfficeHeader
@@ -117,6 +110,18 @@ const DashboardPage = () => {
               onViewAll={() => navigate('/family-office?tab=vencimientos')}
             />
           </>
+        )}
+
+        {canSeeColeCoDashboard && (
+          <CashFlowDashboard
+            currentDateText={currentDateText}
+            fullName={user?.full_name ?? undefined}
+            onIrAMovimientos={() => navigate('/flujo-de-caja?tab=movimientos')}
+            onIrACierres={() => navigate('/flujo-de-caja?tab=cierre')}
+            onVerCuenta={(cuentaId) =>
+              navigate(`/flujo-de-caja?tab=movimientos&cuenta=${cuentaId}`)
+            }
+          />
         )}
       </div>
     </div>

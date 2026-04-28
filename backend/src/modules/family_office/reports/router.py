@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+import io
+
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
@@ -27,18 +29,66 @@ def generate_report(
 
 @router.post("/export-pdf")
 def export_pdf(
-    request: schemas.GeneratePDFRequest,
+    data: schemas.GeneratePDFRequest,
     current_user=Depends(auth_dependencies.require_role(ALLOWED_ROLES)),
 ):
-    pdf_buffer = service.generate_pdf(request)
+    pdf_buffer: io.BytesIO = service.generate_pdf(data)
+    pdf_buffer.seek(0)
 
-    filename = f"Reporte_{request.company_name}_{request.period}.pdf"
-    safe_filename = filename.replace('"', "").replace(" ", "_")
+    safe_company = data.company_name.replace(" ", "_")
+    safe_period = data.period.replace(" ", "_")
+    filename = f"reporte_{safe_company}_{safe_period}.pdf"
 
     return StreamingResponse(
         pdf_buffer,
         media_type="application/pdf",
-        headers={
-            "Content-Disposition": f'attachment; filename="{safe_filename}"',
-        },
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
     )
+
+
+@router.post("/save", response_model=schemas.SavedReportResponse)
+def save_report(
+    data: schemas.SaveReportRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(auth_dependencies.require_role(ALLOWED_ROLES)),
+):
+    return service.save_report(db, data)
+
+
+@router.get("/company/{company_id}", response_model=list[schemas.SavedReportResponse])
+def get_saved_reports(
+    company_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(auth_dependencies.require_role(ALLOWED_ROLES)),
+):
+    return service.get_saved_reports_by_company(db, company_id)
+
+
+@router.get("/{report_id}/download", response_model=schemas.SavedReportDownloadResponse)
+def download_report(
+    report_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(auth_dependencies.require_role(ALLOWED_ROLES)),
+):
+    url = service.get_report_download_url(db, report_id)
+    return {"url": url}
+
+
+@router.get("/all", response_model=list[schemas.SavedReportResponse])
+def get_all_saved_reports(
+    db: Session = Depends(get_db),
+    current_user=Depends(auth_dependencies.require_role(ALLOWED_ROLES)),
+):
+    return service.get_all_saved_reports(db)
+
+
+@router.delete("/{report_id}")
+def delete_saved_report(
+    report_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(auth_dependencies.require_role(ALLOWED_ROLES)),
+):
+    report = service.delete_saved_report(db, report_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="Reporte no encontrado")
+    return {"message": "Reporte eliminado correctamente"}

@@ -7,11 +7,13 @@ import { SidebarProvider } from './context/SidebarContext';
 import Sidebar from './components/Sidebar';
 import CompanyGuard from './components/CompanyGuard';
 import FamilyOfficePage from './pages/FamilyOfficePage';
+import ReportesPage from './pages/ReportesPage';
 import React from 'react';
 import SettingsPage from './pages/SettingsPage';
 import NotificationsPage from './pages/NotificationsPage';
 import CashFlowPage from './pages/CashFlowPage';
 import PaymentsPage from './pages/PaymentsPage';
+import { CASH_FLOW_ALLOWED_ROLES } from './constants/authorization';
 
 function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   return (
@@ -65,7 +67,7 @@ function App() {
         <Route
           path="/flujo-de-caja"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={CASH_FLOW_ALLOWED_ROLES}>
               <LayoutWithSidebar>
                 <CashFlowPage />
               </LayoutWithSidebar>
@@ -97,7 +99,7 @@ function App() {
           element={
             <ProtectedRoute>
               <LayoutWithSidebar>
-                <h1 className="p-6">Reportes</h1>
+                <ReportesPage />
               </LayoutWithSidebar>
             </ProtectedRoute>
           }

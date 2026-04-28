@@ -96,3 +96,27 @@ def delete_deadline(
             detail="Vencimiento no encontrado",
         )
     return {"message": "Vencimiento eliminado correctamente"}
+
+
+@router.post("/{deadline_id}/send-reminder", response_model=schemas.DeadlineResponse)
+def send_reminder(
+    deadline_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(auth_dependencies.require_role(ALLOWED_ROLES)),
+):
+    deadline = service.get_deadline(db, deadline_id)
+
+    if not deadline:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Vencimiento no encontrado",
+        )
+
+    sent = service._send_and_mark_reminder(db, deadline)
+    if not sent:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="No fue posible enviar el recordatorio",
+        )
+
+    return deadline

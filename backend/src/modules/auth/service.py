@@ -38,6 +38,8 @@ def update_user_profile(
     user.alert_deadlines_enabled = profile_data.alert_deadlines_enabled
     user.alert_balances_enabled = profile_data.alert_balances_enabled
     user.alert_reports_enabled = profile_data.alert_reports_enabled
+    user.reminder_window_start_days = profile_data.reminder_window_start_days
+    user.reminder_window_end_days = profile_data.reminder_window_end_days
 
     db.commit()
     db.refresh(user)

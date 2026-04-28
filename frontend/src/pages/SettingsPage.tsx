@@ -17,6 +17,8 @@ type AlertKey =
   | 'alert_balances_enabled'
   | 'alert_reports_enabled';
 
+type AlertPreferences = Record<AlertKey, boolean>;
+
 const alertOptions: Array<{
   key: AlertKey;
   title: string;
@@ -46,9 +48,17 @@ const alertOptions: Array<{
 ];
 
 export default function SettingsPage() {
-  const { user, patchUser, setUser, refreshUser } = useContext(AuthContext);
+  const { user, setUser, refreshUser } = useContext(AuthContext);
+  const isAdmin = user?.role === 'admin';
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [alertPreferences, setAlertPreferences] = useState<AlertPreferences>({
+    alert_deadlines_enabled: false,
+    alert_balances_enabled: false,
+    alert_reports_enabled: false,
+  });
+  const [reminderStartDays, setReminderStartDays] = useState(5);
+  const [reminderEndDays, setReminderEndDays] = useState(7);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -57,17 +67,39 @@ export default function SettingsPage() {
     if (!user) return;
     setFullName(user.full_name ?? '');
     setEmail(user.email);
+    setAlertPreferences({
+      alert_deadlines_enabled: user.alert_deadlines_enabled,
+      alert_balances_enabled: user.alert_balances_enabled,
+      alert_reports_enabled: user.alert_reports_enabled,
+    });
+    setReminderStartDays(user.reminder_window_start_days);
+    setReminderEndDays(user.reminder_window_end_days);
   }, [user]);
 
   if (!user) return null;
 
   const handleToggleAlert = (key: AlertKey) => {
-    patchUser({ [key]: !user[key] });
+    setAlertPreferences((currentPreferences) => ({
+      ...currentPreferences,
+      [key]: !currentPreferences[key],
+    }));
     setMessage(null);
     setError(null);
   };
 
   const handleSave = async () => {
+    if (isAdmin && reminderStartDays > reminderEndDays) {
+      setError('El inicio del rango no puede ser mayor al fin del rango.');
+      setMessage(null);
+      return;
+    }
+
+    if (isAdmin && (reminderStartDays < 0 || reminderEndDays < 0)) {
+      setError('El rango de recordatorios no puede tener valores negativos.');
+      setMessage(null);
+      return;
+    }
+
     setSaving(true);
     setMessage(null);
     setError(null);
@@ -76,9 +108,15 @@ export default function SettingsPage() {
       const updatedUser = await updateMe({
         full_name: fullName.trim(),
         email: email.trim(),
-        alert_deadlines_enabled: user.alert_deadlines_enabled,
-        alert_balances_enabled: user.alert_balances_enabled,
-        alert_reports_enabled: user.alert_reports_enabled,
+        alert_deadlines_enabled: alertPreferences.alert_deadlines_enabled,
+        alert_balances_enabled: alertPreferences.alert_balances_enabled,
+        alert_reports_enabled: alertPreferences.alert_reports_enabled,
+        reminder_window_start_days: isAdmin
+          ? reminderStartDays
+          : user.reminder_window_start_days,
+        reminder_window_end_days: isAdmin
+          ? reminderEndDays
+          : user.reminder_window_end_days,
       });
 
       setUser(updatedUser);
@@ -206,20 +244,85 @@ export default function SettingsPage() {
                     <button
                       type="button"
                       onClick={() => handleToggleAlert(key)}
-                      aria-label={`Alternar ${title}`}
-                      className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-200 ${
-                        user[key] ? 'bg-secondary' : 'bg-neutral-border'
+                      role="switch"
+                      aria-label={title}
+                      aria-checked={alertPreferences[key]}
+                      className={`relative mt-1 inline-flex h-8 w-14 flex-shrink-0 items-center rounded-full border border-transparent transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-secondary/30 ${
+                        alertPreferences[key]
+                          ? 'bg-secondary shadow-sm shadow-secondary/20'
+                          : 'bg-neutral-border'
                       }`}
                     >
                       <span
-                        className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-200 ${
-                          user[key] ? 'translate-x-6' : 'translate-x-1'
+                        className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                          alertPreferences[key]
+                            ? 'translate-x-7'
+                            : 'translate-x-1'
                         }`}
                       />
                     </button>
                   </div>
                 </div>
               ))}
+
+              <div className="rounded-2xl border border-neutral-border bg-white p-4">
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-bg text-neutral-text">
+                    <CalendarClock size={18} />
+                  </div>
+                  <div className="w-full">
+                    <p className="text-sm font-semibold text-neutral-text">
+                      Rango de recordatorio por correo
+                    </p>
+                    <p className="mt-1 text-xs text-neutral-muted">
+                      Define entre cuántos días antes del vencimiento se envía
+                      el correo automático. El sistema envía una sola vez por
+                      obligación.
+                    </p>
+
+                    <div className="mt-3 grid grid-cols-2 gap-3">
+                      <label className="block">
+                        <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-neutral-muted">
+                          Desde (días)
+                        </span>
+                        <input
+                          type="number"
+                          min={0}
+                          value={reminderStartDays}
+                          disabled={!isAdmin}
+                          onChange={(event) =>
+                            setReminderStartDays(Number(event.target.value))
+                          }
+                          className="w-full rounded-2xl border border-neutral-border bg-white px-3 py-2 text-sm text-neutral-text outline-none transition-colors duration-200 focus:border-secondary disabled:cursor-not-allowed disabled:bg-neutral-bg disabled:text-neutral-muted"
+                        />
+                      </label>
+
+                      <label className="block">
+                        <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-neutral-muted">
+                          Hasta (días)
+                        </span>
+                        <input
+                          type="number"
+                          min={0}
+                          value={reminderEndDays}
+                          disabled={!isAdmin}
+                          onChange={(event) =>
+                            setReminderEndDays(Number(event.target.value))
+                          }
+                          className="w-full rounded-2xl border border-neutral-border bg-white px-3 py-2 text-sm text-neutral-text outline-none transition-colors duration-200 focus:border-secondary disabled:cursor-not-allowed disabled:bg-neutral-bg disabled:text-neutral-muted"
+                        />
+                      </label>
+                    </div>
+
+                    {!isAdmin && (
+                      <p className="mt-2 text-xs text-neutral-muted">
+                        Solo el usuario administrador puede modificar este
+                        rango.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         </div>
