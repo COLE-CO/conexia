@@ -1,6 +1,8 @@
 import logging
+import os
 from datetime import date, datetime, timedelta, timezone
 
+from fastapi import HTTPException, UploadFile, status
 from sqlalchemy import case
 from sqlalchemy.orm import Session
 
@@ -10,8 +12,17 @@ from src.modules.family_office.companies import service as company_service
 from src.modules.notifications.email_service import send_reminder_email
 
 from . import models, schemas
+from .storage import (
+    delete_file_from_s3,
+    generate_presigned_download_url,
+    generate_storage_key,
+    upload_file_to_s3,
+)
 
 logger = logging.getLogger(__name__)
+
+ALLOWED_PROOF_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg"}
+MAX_PROOF_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 
 DEFAULT_REMINDER_WINDOW_START_DAYS = 5
 DEFAULT_REMINDER_WINDOW_END_DAYS = 7
@@ -97,6 +108,12 @@ def confirm_deadline(db: Session, deadline_id: int):
     if not deadline:
         return None
 
+    if not deadline.proof_storage_key:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Debe adjuntar un comprobante antes de marcar el vencimiento como cumplido",
+        )
+
     deadline.status = models.DeadlineStatus.CUMPLIDO
     db.commit()
     db.refresh(deadline)
@@ -109,9 +126,129 @@ def delete_deadline(db: Session, deadline_id: int):
     if not deadline:
         return None
 
+    if deadline.proof_storage_key:
+        try:
+            delete_file_from_s3(deadline.proof_storage_key)
+        except Exception:
+            logger.exception(
+                "Failed to delete proof file from S3 for deadline %s", deadline.id
+            )
+
     db.delete(deadline)
     db.commit()
     return deadline
+
+
+def attach_proof(db: Session, deadline_id: int, file: UploadFile):
+    deadline = get_deadline(db, deadline_id)
+    if not deadline:
+        return None
+
+    if not file.filename:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El archivo no tiene un nombre válido",
+        )
+
+    extension = os.path.splitext(file.filename)[1].lower()
+    if extension not in ALLOWED_PROOF_EXTENSIONS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Formato de archivo no permitido. Use PDF, PNG o JPG",
+        )
+
+    file.file.seek(0, 2)
+    file_size = file.file.tell()
+    file.file.seek(0)
+
+    if file_size > MAX_PROOF_FILE_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El archivo excede el tamaño máximo permitido de 10 MB",
+        )
+
+    previous_key = deadline.proof_storage_key
+
+    storage_key = generate_storage_key(
+        deadline.company_id, deadline.id, file.filename
+    )
+    upload_file_to_s3(
+        file.file, storage_key, file.content_type or "application/octet-stream"
+    )
+
+    deadline.proof_storage_key = storage_key
+    deadline.proof_filename = file.filename
+    deadline.proof_content_type = file.content_type
+    deadline.proof_file_size = file_size
+    deadline.proof_uploaded_at = datetime.now(timezone.utc)
+
+    db.commit()
+    db.refresh(deadline)
+
+    if previous_key and previous_key != storage_key:
+        try:
+            delete_file_from_s3(previous_key)
+        except Exception:
+            logger.exception(
+                "Failed to delete previous proof file for deadline %s", deadline.id
+            )
+
+    return deadline
+
+
+def remove_proof(db: Session, deadline_id: int):
+    deadline = get_deadline(db, deadline_id)
+    if not deadline:
+        return None
+
+    if not deadline.proof_storage_key:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="El vencimiento no tiene comprobante adjunto",
+        )
+
+    if deadline.status == models.DeadlineStatus.CUMPLIDO:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No se puede eliminar el comprobante de un vencimiento cumplido",
+        )
+
+    storage_key = deadline.proof_storage_key
+
+    deadline.proof_storage_key = None
+    deadline.proof_filename = None
+    deadline.proof_content_type = None
+    deadline.proof_file_size = None
+    deadline.proof_uploaded_at = None
+
+    db.commit()
+    db.refresh(deadline)
+
+    try:
+        delete_file_from_s3(storage_key)
+    except Exception:
+        logger.exception(
+            "Failed to delete proof file from S3 for deadline %s", deadline.id
+        )
+
+    return deadline
+
+
+def get_proof_download_url(db: Session, deadline_id: int) -> tuple[str, str] | None:
+    deadline = get_deadline(db, deadline_id)
+    if not deadline:
+        return None
+
+    if not deadline.proof_storage_key or not deadline.proof_filename:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="El vencimiento no tiene comprobante adjunto",
+        )
+
+    url = generate_presigned_download_url(
+        deadline.proof_storage_key, deadline.proof_filename
+    )
+    return url, deadline.proof_filename
 
 
 def _send_and_mark_reminder(db: Session, deadline: models.Deadline) -> bool:

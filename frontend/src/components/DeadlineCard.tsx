@@ -1,5 +1,13 @@
-import { useState } from 'react';
-import { MoreVertical, Check, Pencil, Trash2 } from 'lucide-react';
+import { useRef, useState } from 'react';
+import {
+  MoreVertical,
+  Check,
+  Pencil,
+  Trash2,
+  Paperclip,
+  Download,
+  FileX,
+} from 'lucide-react';
 import type { Deadline } from '../services/deadlineService';
 
 interface Props {
@@ -7,6 +15,9 @@ interface Props {
   onConfirm: (id: number) => void;
   onEdit: (deadline: Deadline) => void;
   onDelete: (id: number) => void;
+  onUploadProof: (id: number, file: File) => void;
+  onDownloadProof: (id: number) => void;
+  onRemoveProof: (id: number) => void;
   companyName?: string;
   isLast?: boolean;
 }
@@ -36,14 +47,39 @@ export default function DeadlineCard({
   onConfirm,
   onEdit,
   onDelete,
+  onUploadProof,
+  onDownloadProof,
+  onRemoveProof,
   companyName,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const semaphore = getSemaphore(deadline.due_date, deadline.status);
+  const hasProof = Boolean(deadline.proof_filename);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      onUploadProof(deadline.id, file);
+    }
+    e.target.value = '';
+  };
 
   return (
     <tr className="border-b border-neutral-border hover:bg-neutral-bg/50 transition-colors duration-150">
-      <td className="py-4 px-4 text-sm text-neutral-text">{deadline.name}</td>
+      <td className="py-4 px-4 text-sm text-neutral-text">
+        <div className="flex items-center gap-2">
+          <span>{deadline.name}</span>
+          {hasProof && (
+            <span
+              title={`Comprobante: ${deadline.proof_filename}`}
+              className="text-secondary"
+            >
+              <Paperclip size={14} />
+            </span>
+          )}
+        </div>
+      </td>
       <td className="py-4 px-4 text-sm text-neutral-muted">
         {companyName ?? '—'}
       </td>
@@ -58,6 +94,13 @@ export default function DeadlineCard({
         </span>
       </td>
       <td className="py-4 px-4 relative">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
+          className="hidden"
+          onChange={handleFileChange}
+        />
         <button
           onClick={() => setMenuOpen((prev) => !prev)}
           className="p-1 rounded-lg text-neutral-muted hover:bg-neutral-bg transition-colors duration-200"
@@ -67,13 +110,12 @@ export default function DeadlineCard({
 
         {menuOpen && (
           <>
-            {/* Overlay para cerrar */}
             <div
               className="fixed inset-0 z-40"
               onClick={() => setMenuOpen(false)}
             />
             <div
-              className={`absolute right-4 z-50 bg-neutral-surface border border-neutral-border rounded-xl shadow-lg w-40 overflow-hidden
+              className={`absolute right-4 z-50 bg-neutral-surface border border-neutral-border rounded-xl shadow-lg w-52 overflow-hidden
               ${'bottom-8'}
             `}
             >
@@ -83,9 +125,51 @@ export default function DeadlineCard({
                     onConfirm(deadline.id);
                     setMenuOpen(false);
                   }}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200"
+                  disabled={!hasProof}
+                  title={
+                    !hasProof
+                      ? 'Adjunta un comprobante para poder confirmar'
+                      : undefined
+                  }
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                 >
                   <Check size={14} className="text-green-500" /> Confirmar
+                </button>
+              )}
+              {deadline.status === 'pendiente' && (
+                <button
+                  onClick={() => {
+                    fileInputRef.current?.click();
+                    setMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200"
+                >
+                  <Paperclip size={14} className="text-secondary" />
+                  {hasProof ? 'Reemplazar comprobante' : 'Subir comprobante'}
+                </button>
+              )}
+              {hasProof && (
+                <button
+                  onClick={() => {
+                    onDownloadProof(deadline.id);
+                    setMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200"
+                >
+                  <Download size={14} className="text-secondary" /> Descargar
+                  comprobante
+                </button>
+              )}
+              {hasProof && deadline.status === 'pendiente' && (
+                <button
+                  onClick={() => {
+                    onRemoveProof(deadline.id);
+                    setMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200"
+                >
+                  <FileX size={14} className="text-red-400" /> Eliminar
+                  comprobante
                 </button>
               )}
               <button

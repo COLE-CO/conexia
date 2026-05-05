@@ -13,7 +13,11 @@ import {
   getDeadlinesByCompany,
   confirmDeadline,
   deleteDeadline,
+  uploadDeadlineProof,
+  getDeadlineProofUrl,
+  deleteDeadlineProof,
 } from '../services/deadlineService';
+import { toast } from 'sonner';
 import type { Deadline } from '../services/deadlineService';
 import UploadBalanceModal from '../components/UploadBalanceModal';
 import DeadlineCard from '../components/DeadlineCard';
@@ -206,11 +210,19 @@ export default function FamilyOfficePage() {
   };
 
   const handleConfirmDeadline = async (id: number) => {
-    await confirmDeadline(id);
-    if (activeCompany) {
-      getDeadlinesByCompany(activeCompany.id)
-        .then((data) => setDeadlines(sortDeadlines(data)))
-        .catch(() => setDeadlines([]));
+    try {
+      await confirmDeadline(id);
+      if (activeCompany) {
+        getDeadlinesByCompany(activeCompany.id)
+          .then((data) => setDeadlines(sortDeadlines(data)))
+          .catch(() => setDeadlines([]));
+      }
+      toast.success('Vencimiento marcado como cumplido');
+    } catch (err) {
+      const detail =
+        (err as { response?: { data?: { detail?: string } } })?.response?.data
+          ?.detail ?? 'No se pudo confirmar el vencimiento';
+      toast.error(detail);
     }
   };
 
@@ -218,6 +230,45 @@ export default function FamilyOfficePage() {
     await deleteDeadline(id);
     setDeadlines((prev) => sortDeadlines(prev.filter((d) => d.id !== id)));
     setConfirmDeleteDeadline(null);
+  };
+
+  const handleUploadDeadlineProof = async (id: number, file: File) => {
+    try {
+      const updated = await uploadDeadlineProof(id, file);
+      setDeadlines((prev) =>
+        sortDeadlines(prev.map((d) => (d.id === id ? updated : d)))
+      );
+      toast.success('Comprobante subido correctamente');
+    } catch (err) {
+      const detail =
+        (err as { response?: { data?: { detail?: string } } })?.response?.data
+          ?.detail ?? 'No se pudo subir el comprobante';
+      toast.error(detail);
+    }
+  };
+
+  const handleDownloadDeadlineProof = async (id: number) => {
+    try {
+      const { url } = await getDeadlineProofUrl(id);
+      window.open(url, '_blank');
+    } catch {
+      toast.error('No se pudo descargar el comprobante');
+    }
+  };
+
+  const handleRemoveDeadlineProof = async (id: number) => {
+    try {
+      const updated = await deleteDeadlineProof(id);
+      setDeadlines((prev) =>
+        sortDeadlines(prev.map((d) => (d.id === id ? updated : d)))
+      );
+      toast.success('Comprobante eliminado');
+    } catch (err) {
+      const detail =
+        (err as { response?: { data?: { detail?: string } } })?.response?.data
+          ?.detail ?? 'No se pudo eliminar el comprobante';
+      toast.error(detail);
+    }
   };
 
   const handleDeadlineSuccess = (deadline: Deadline) => {
@@ -523,6 +574,9 @@ export default function FamilyOfficePage() {
                       setShowDeadlineModal(true);
                     }}
                     onDelete={(id) => setConfirmDeleteDeadline(id)}
+                    onUploadProof={handleUploadDeadlineProof}
+                    onDownloadProof={handleDownloadDeadlineProof}
+                    onRemoveProof={handleRemoveDeadlineProof}
                   />
                 ))}
               </tbody>

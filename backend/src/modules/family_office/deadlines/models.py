@@ -31,6 +31,11 @@ class Deadline(Base):
     client_email = Column(String, nullable=False)
     amount = Column(String, nullable=True)
     reminder_sent_at = Column(DateTime(timezone=True), nullable=True)
+    proof_storage_key = Column(String, nullable=True)
+    proof_filename = Column(String, nullable=True)
+    proof_content_type = Column(String, nullable=True)
+    proof_file_size = Column(Integer, nullable=True)
+    proof_uploaded_at = Column(DateTime(timezone=True), nullable=True)
     status = Column(
         SqlEnum(DeadlineStatus, values_callable=lambda x: [e.value for e in x]),
         default=DeadlineStatus.PENDIENTE,

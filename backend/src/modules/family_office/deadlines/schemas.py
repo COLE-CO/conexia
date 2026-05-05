@@ -32,8 +32,17 @@ class DeadlineResponse(DeadlineBase):
     id: int
     company_id: int
     status: DeadlineStatus
+    proof_filename: str | None = None
+    proof_content_type: str | None = None
+    proof_file_size: int | None = None
+    proof_uploaded_at: datetime | None = None
     created_at: datetime
     updated_at: datetime
 
     class Config:
         from_attributes = True
+
+
+class DeadlineProofDownload(BaseModel):
+    url: str
+    filename: str
