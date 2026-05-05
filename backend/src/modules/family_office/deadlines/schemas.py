@@ -2,16 +2,18 @@ from datetime import date, datetime
 
 from pydantic import BaseModel
 
-from .models import DeadlineStatus
+from .models import DeadlineSource, DeadlineStatus, ObligationType
 
 
 class DeadlineBase(BaseModel):
     name: str
     description: str | None = None
     due_date: date
-    client_email: str
+    client_email: str | None = None
     amount: str | None = None
     reminder_sent_at: datetime | None = None
+    obligation_type: ObligationType | None = None
+    period_label: str | None = None
 
 
 class DeadlineCreate(DeadlineBase):
@@ -26,12 +28,15 @@ class DeadlineUpdate(BaseModel):
     amount: str | None = None
     reminder_sent_at: datetime | None = None
     status: DeadlineStatus | None = None
+    obligation_type: ObligationType | None = None
+    period_label: str | None = None
 
 
 class DeadlineResponse(DeadlineBase):
     id: int
     company_id: int
     status: DeadlineStatus
+    source: DeadlineSource
     proof_filename: str | None = None
     proof_content_type: str | None = None
     proof_file_size: int | None = None
@@ -46,3 +51,9 @@ class DeadlineResponse(DeadlineBase):
 class DeadlineProofDownload(BaseModel):
     url: str
     filename: str
+
+
+class CalendarImportSummary(BaseModel):
+    created: int
+    skipped: int
+    unmatched_companies: list[str]

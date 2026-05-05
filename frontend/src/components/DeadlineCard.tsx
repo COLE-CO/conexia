@@ -9,6 +9,7 @@ import {
   FileX,
 } from 'lucide-react';
 import type { Deadline } from '../services/deadlineService';
+import { OBLIGATION_LABELS } from '../services/deadlineService';
 
 interface Props {
   deadline: Deadline;
@@ -68,14 +69,30 @@ export default function DeadlineCard({
   return (
     <tr className="border-b border-neutral-border hover:bg-neutral-bg/50 transition-colors duration-150">
       <td className="py-4 px-4 text-sm text-neutral-text">
-        <div className="flex items-center gap-2">
-          <span>{deadline.name}</span>
-          {hasProof && (
-            <span
-              title={`Comprobante: ${deadline.proof_filename}`}
-              className="text-secondary"
-            >
-              <Paperclip size={14} />
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-medium">
+              {deadline.obligation_type
+                ? OBLIGATION_LABELS[deadline.obligation_type] ?? deadline.name
+                : deadline.name}
+            </span>
+            {deadline.source === 'calendar_dian_2026' && (
+              <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/30">
+                DIAN
+              </span>
+            )}
+            {hasProof && (
+              <span
+                title={`Comprobante: ${deadline.proof_filename}`}
+                className="text-secondary"
+              >
+                <Paperclip size={14} />
+              </span>
+            )}
+          </div>
+          {deadline.period_label && (
+            <span className="text-xs text-neutral-muted">
+              {deadline.period_label}
             </span>
           )}
         </div>

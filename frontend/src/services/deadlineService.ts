@@ -2,16 +2,36 @@ import api from './api';
 
 export type DeadlineStatus = 'pendiente' | 'cumplido';
 
+export type DeadlineSource = 'manual' | 'calendar_dian_2026';
+
+export type ObligationType =
+  | 'retencion'
+  | 'iva_bimestral'
+  | 'iva_cuatrimestral'
+  | 'anticipo_rst'
+  | 'renta_pj'
+  | 'exogena'
+  | 'medios_magneticos'
+  | 'supersociedades'
+  | 'patrimonio'
+  | 'ica_medellin'
+  | 'ica_envigado'
+  | 'ica_armenia'
+  | 'ica_riohacha';
+
 export interface Deadline {
   id: number;
   company_id: number;
   name: string;
   description?: string;
   due_date: string;
-  client_email: string;
+  client_email?: string | null;
   amount?: string;
   reminder_sent_at?: string;
   status: DeadlineStatus;
+  source: DeadlineSource;
+  obligation_type?: ObligationType | null;
+  period_label?: string | null;
   proof_filename?: string | null;
   proof_content_type?: string | null;
   proof_file_size?: number | null;
@@ -93,4 +113,29 @@ export const getDeadlineProofUrl = async (
 export const deleteDeadlineProof = async (id: number): Promise<Deadline> => {
   const response = await api.delete(`/deadlines/${id}/proof`);
   return response.data;
+};
+
+export const regenerateDianCalendar = async (
+  companyId: number
+): Promise<{ created: number }> => {
+  const response = await api.post(
+    `/companies/${companyId}/regenerate-dian-calendar`
+  );
+  return response.data;
+};
+
+export const OBLIGATION_LABELS: Record<ObligationType, string> = {
+  retencion: 'Retención en la fuente',
+  iva_bimestral: 'IVA bimestral',
+  iva_cuatrimestral: 'IVA cuatrimestral',
+  anticipo_rst: 'Anticipo RST',
+  renta_pj: 'Renta PJ',
+  exogena: 'Exógena',
+  medios_magneticos: 'Medios magnéticos',
+  supersociedades: 'Supersociedades',
+  patrimonio: 'Patrimonio',
+  ica_medellin: 'ICA Medellín',
+  ica_envigado: 'ICA Envigado',
+  ica_armenia: 'ICA Armenia',
+  ica_riohacha: 'ICA Riohacha',
 };
