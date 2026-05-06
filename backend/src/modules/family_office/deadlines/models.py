@@ -28,9 +28,11 @@ class DeadlineSource(str, enum.Enum):
 
 class ObligationType(str, enum.Enum):
     RETENCION = "retencion"
-    IVA = "iva"
+    IVA_BIMESTRAL = "iva_bimestral"
+    IVA_CUATRIMESTRAL = "iva_cuatrimestral"
     ANTICIPO_RST = "anticipo_rst"
-    RENTA = "renta"
+    RENTA_PJ = "renta_pj"
+    EXOGENA = "exogena"
     MEDIOS_MAGNETICOS = "medios_magneticos"
     SUPERSOCIEDADES = "supersociedades"
     PATRIMONIO = "patrimonio"
