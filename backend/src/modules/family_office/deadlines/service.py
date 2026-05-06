@@ -172,9 +172,7 @@ def attach_proof(db: Session, deadline_id: int, file: UploadFile):
 
     previous_key = deadline.proof_storage_key
 
-    storage_key = generate_storage_key(
-        deadline.company_id, deadline.id, file.filename
-    )
+    storage_key = generate_storage_key(deadline.company_id, deadline.id, file.filename)
     upload_file_to_s3(
         file.file, storage_key, file.content_type or "application/octet-stream"
     )

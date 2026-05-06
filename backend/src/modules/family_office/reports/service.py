@@ -140,9 +140,7 @@ def _compute_ratios(
         else None
     )
     return schemas.FinancialRatios(
-        current_ratio=_safe_div(
-            snapshot.current_assets, snapshot.current_liabilities
-        ),
+        current_ratio=_safe_div(snapshot.current_assets, snapshot.current_liabilities),
         debt_ratio=_safe_div(snapshot.total_liabilities, snapshot.total_assets),
         equity_ratio=_safe_div(snapshot.equity, snapshot.total_assets),
         net_margin=_safe_div(net_result, total_income) if total_income else None,

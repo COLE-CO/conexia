@@ -82,9 +82,7 @@ def delete_company(
 def regenerate_dian_calendar(
     company_id: int,
     db: Session = Depends(get_db),
-    current_user=Depends(
-        auth_dependencies.require_role([auth_models.UserRole.ADMIN])
-    ),
+    current_user=Depends(auth_dependencies.require_role([auth_models.UserRole.ADMIN])),
 ):
     company = service.get_company(db, company_id)
     if not company:

@@ -335,9 +335,7 @@ def _build_items_table(items: list[schemas.LineItem], accent_color):
     return table
 
 
-def _build_results_strip(
-    total_income: float, total_expenses: float, net_result: float
-):
+def _build_results_strip(total_income: float, total_expenses: float, net_result: float):
     net_color = GREEN_ACCENT if net_result >= 0 else RED_ACCENT
     rows = [
         [
@@ -389,9 +387,7 @@ def _build_results_strip(
 
 def _build_bullet_list(items: list[str], styles, color=SECONDARY_COLOR):
     if not items:
-        return Paragraph(
-            "<i>Sin observaciones registradas.</i>", styles["bullet"]
-        )
+        return Paragraph("<i>Sin observaciones registradas.</i>", styles["bullet"])
     elements = []
     for text in items:
         safe = text.replace("\n", " ").strip()
@@ -445,9 +441,7 @@ def generate_report_pdf(data: schemas.GeneratePDFRequest) -> io.BytesIO:
     # ─── Resultado del periodo (banda) ───────────────────────────────────
     elements.append(Paragraph("Resultado del periodo", styles["section"]))
     elements.append(
-        _build_results_strip(
-            data.total_income, data.total_expenses, data.net_result
-        )
+        _build_results_strip(data.total_income, data.total_expenses, data.net_result)
     )
 
     # ─── Composición de ingresos ─────────────────────────────────────────

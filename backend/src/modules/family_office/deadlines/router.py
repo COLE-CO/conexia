@@ -118,9 +118,7 @@ def upload_deadline_proof(
     return deadline
 
 
-@router.get(
-    "/{deadline_id}/proof", response_model=schemas.DeadlineProofDownload
-)
+@router.get("/{deadline_id}/proof", response_model=schemas.DeadlineProofDownload)
 def download_deadline_proof(
     deadline_id: int,
     db: Session = Depends(get_db),
@@ -136,9 +134,7 @@ def download_deadline_proof(
     return schemas.DeadlineProofDownload(url=url, filename=filename)
 
 
-@router.delete(
-    "/{deadline_id}/proof", response_model=schemas.DeadlineResponse
-)
+@router.delete("/{deadline_id}/proof", response_model=schemas.DeadlineResponse)
 def delete_deadline_proof(
     deadline_id: int,
     db: Session = Depends(get_db),

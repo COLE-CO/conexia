@@ -40,15 +40,24 @@ class DianDeadline:
 # ---------------------------------------------------------------------------
 
 _RETENCION_PERIODOS = [
-    "Enero 2026", "Febrero 2026", "Marzo 2026", "Abril 2026",
-    "Mayo 2026", "Junio 2026", "Julio 2026", "Agosto 2026",
-    "Septiembre 2026", "Octubre 2026", "Noviembre 2026", "Diciembre 2026",
+    "Enero 2026",
+    "Febrero 2026",
+    "Marzo 2026",
+    "Abril 2026",
+    "Mayo 2026",
+    "Junio 2026",
+    "Julio 2026",
+    "Agosto 2026",
+    "Septiembre 2026",
+    "Octubre 2026",
+    "Noviembre 2026",
+    "Diciembre 2026",
 ]
 
 # Cada lista interna: 12 días, uno por periodo. El vencimiento siempre cae en
 # el mes siguiente al periodo (el de diciembre se paga en enero del año siguiente).
 _RETENCION_DIAS = {
-    1: [10, 10, 13, 12, 10,  9, 12,  9,  9, 11, 10, 13],
+    1: [10, 10, 13, 12, 10, 9, 12, 9, 9, 11, 10, 13],
     2: [11, 11, 14, 13, 11, 10, 13, 10, 13, 12, 11, 14],
     3: [12, 12, 15, 14, 12, 13, 14, 11, 14, 13, 14, 15],
     4: [13, 13, 16, 15, 16, 14, 18, 14, 15, 17, 15, 18],
@@ -62,9 +71,18 @@ _RETENCION_DIAS = {
 
 # Mes calendario donde efectivamente vence cada periodo del bloque anterior.
 _RETENCION_MESES_VENCIMIENTO = [
-    (2026, 2), (2026, 3), (2026, 4), (2026, 5),
-    (2026, 6), (2026, 7), (2026, 8), (2026, 9),
-    (2026, 10), (2026, 11), (2026, 12), (2027, 1),
+    (2026, 2),
+    (2026, 3),
+    (2026, 4),
+    (2026, 5),
+    (2026, 6),
+    (2026, 7),
+    (2026, 8),
+    (2026, 9),
+    (2026, 10),
+    (2026, 11),
+    (2026, 12),
+    (2027, 1),
 ]
 
 
@@ -98,11 +116,16 @@ _IVA_BIMESTRAL_PERIODOS = [
 ]
 
 _IVA_BIMESTRAL_MESES_VENCIMIENTO = [
-    (2026, 3), (2026, 5), (2026, 7), (2026, 9), (2026, 11), (2027, 1),
+    (2026, 3),
+    (2026, 5),
+    (2026, 7),
+    (2026, 9),
+    (2026, 11),
+    (2027, 1),
 ]
 
 _IVA_BIMESTRAL_DIAS = {
-    1: [10, 12,  9,  9, 11, 13],
+    1: [10, 12, 9, 9, 11, 13],
     2: [11, 13, 10, 10, 12, 14],
     3: [12, 14, 13, 11, 13, 15],
     4: [13, 15, 14, 14, 17, 18],
@@ -147,7 +170,7 @@ _IVA_CUATRIMESTRAL_PERIODOS = [
 _IVA_CUATRIMESTRAL_MESES_VENCIMIENTO = [(2026, 5), (2026, 9), (2027, 1)]
 
 _IVA_CUATRIMESTRAL_DIAS = {
-    1: [12,  9, 13],
+    1: [12, 9, 13],
     2: [13, 10, 14],
     3: [14, 11, 15],
     4: [15, 14, 18],
@@ -192,11 +215,16 @@ _RST_PERIODOS = [
 ]
 
 _RST_MESES_VENCIMIENTO = [
-    (2026, 5), (2026, 6), (2026, 7), (2026, 9), (2026, 11), (2027, 1),
+    (2026, 5),
+    (2026, 6),
+    (2026, 7),
+    (2026, 9),
+    (2026, 11),
+    (2027, 1),
 ]
 
 _RST_DIAS = {
-    1: [12, 10,  9,  9, 11, 13],
+    1: [12, 10, 9, 9, 11, 13],
     2: [13, 11, 10, 10, 12, 14],
     3: [14, 12, 13, 11, 13, 15],
     4: [15, 16, 14, 14, 17, 18],
@@ -230,7 +258,7 @@ def _anticipo_rst(ultimo_digito: int) -> list[DianDeadline]:
 
 # Mapa último_dígito -> (día_mayo_cuota1, día_julio_cuota2)
 _RENTA_PJ_DIAS = {
-    1: (12,  9),
+    1: (12, 9),
     2: (13, 10),
     3: (14, 13),
     4: (15, 14),
@@ -268,8 +296,8 @@ def _renta_pj(ultimo_digito: int) -> list[DianDeadline]:
 # ---------------------------------------------------------------------------
 
 _EXOGENA_PJ_TABLA: list[tuple[int, int, date]] = [
-    ( 1,  5, date(2026, 5, 14)),
-    ( 6, 10, date(2026, 5, 15)),
+    (1, 5, date(2026, 5, 14)),
+    (6, 10, date(2026, 5, 15)),
     (11, 15, date(2026, 5, 19)),
     (16, 20, date(2026, 5, 20)),
     (21, 25, date(2026, 5, 21)),
