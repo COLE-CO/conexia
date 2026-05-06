@@ -19,7 +19,12 @@ import {
   exportReportPDF,
   saveReport,
 } from '../services/reportService';
-import type { LineItem, ReportData } from '../services/reportService';
+import type {
+  FinancialRatios,
+  FinancialSnapshot,
+  LineItem,
+  ReportData,
+} from '../services/reportService';
 import { useCompany } from '../context/CompanyContext';
 import { AuthContext } from '../context/AuthContext';
 import { useContext } from 'react';
@@ -53,6 +58,10 @@ export default function ReportModal({
   const [companyName, setCompanyName] = useState('');
   const [period, setPeriod] = useState('');
   const [exporting, setExporting] = useState(false);
+  const [snapshot, setSnapshot] = useState<FinancialSnapshot | null>(null);
+  const [ratios, setRatios] = useState<FinancialRatios | null>(null);
+  const [findings, setFindings] = useState<string[]>([]);
+  const [recommendations, setRecommendations] = useState<string[]>([]);
 
   const totals = useMemo(() => {
     const totalIncome = items
@@ -87,6 +96,10 @@ export default function ReportModal({
       setAiSummary(data.ai_summary);
       setCompanyName(data.company_name);
       setPeriod(data.period);
+      setSnapshot(data.snapshot ?? null);
+      setRatios(data.ratios ?? null);
+      setFindings(data.findings ?? []);
+      setRecommendations(data.recommendations ?? []);
       if (user?.id) {
         appendStoredNotificationEvent(user.id, {
           id: `report-${selectedBalanceId}-${Date.now()}`,
@@ -125,6 +138,10 @@ export default function ReportModal({
         total_expenses: totals.totalExpenses,
         net_result: totals.netResult,
         ai_summary: aiSummary,
+        snapshot,
+        ratios,
+        findings,
+        recommendations,
       });
 
       if (activeCompany) {
@@ -139,6 +156,10 @@ export default function ReportModal({
           total_expenses: totals.totalExpenses,
           net_result: totals.netResult,
           items,
+          snapshot,
+          ratios,
+          findings,
+          recommendations,
         });
         toast.success('Reporte guardado correctamente', {
           description: `${companyName} · ${period}`,

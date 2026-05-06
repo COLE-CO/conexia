@@ -3,7 +3,7 @@ import io
 import openpyxl
 import pdfplumber
 
-MAX_CHARS = 12000
+MAX_CHARS = 24000
 
 
 def extract_balance_content(file_bytes: bytes, file_type: str) -> str:

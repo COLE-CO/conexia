@@ -7,6 +7,26 @@ export interface LineItem {
   subcategory: string;
 }
 
+export interface FinancialSnapshot {
+  total_assets?: number | null;
+  current_assets?: number | null;
+  non_current_assets?: number | null;
+  total_liabilities?: number | null;
+  current_liabilities?: number | null;
+  non_current_liabilities?: number | null;
+  equity?: number | null;
+  cash_and_equivalents?: number | null;
+  accounts_receivable?: number | null;
+}
+
+export interface FinancialRatios {
+  current_ratio?: number | null;
+  debt_ratio?: number | null;
+  equity_ratio?: number | null;
+  net_margin?: number | null;
+  working_capital?: number | null;
+}
+
 export interface ReportData {
   company_name: string;
   period: string;
@@ -15,6 +35,10 @@ export interface ReportData {
   total_expenses: number;
   net_result: number;
   ai_summary: string;
+  snapshot?: FinancialSnapshot | null;
+  ratios?: FinancialRatios | null;
+  findings?: string[];
+  recommendations?: string[];
 }
 
 export interface SaveReportRequest {
@@ -28,6 +52,10 @@ export interface SaveReportRequest {
   total_expenses: number;
   net_result: number;
   items: LineItem[];
+  snapshot?: FinancialSnapshot | null;
+  ratios?: FinancialRatios | null;
+  findings?: string[];
+  recommendations?: string[];
 }
 
 export interface SavedReport {
@@ -54,6 +82,10 @@ export interface ExportPDFRequest {
   total_expenses: number;
   net_result: number;
   ai_summary: string;
+  snapshot?: FinancialSnapshot | null;
+  ratios?: FinancialRatios | null;
+  findings?: string[];
+  recommendations?: string[];
 }
 
 export async function generateReport(balanceId: number): Promise<ReportData> {
