@@ -20,10 +20,7 @@ import {
   OBLIGATION_LABELS,
 } from '../services/deadlineService';
 import { toast } from 'sonner';
-import type {
-  Deadline,
-  ObligationType,
-} from '../services/deadlineService';
+import type { Deadline, ObligationType } from '../services/deadlineService';
 import UploadBalanceModal from '../components/UploadBalanceModal';
 import DeadlineCard from '../components/DeadlineCard';
 import DeadlineModal from '../components/DeadlineModal';
@@ -369,7 +366,9 @@ export default function FamilyOfficePage() {
           </div>
           <div
             className={
-              activeTab === 'vencimientos' ? 'flex items-center gap-2' : 'hidden'
+              activeTab === 'vencimientos'
+                ? 'flex items-center gap-2'
+                : 'hidden'
             }
           >
             {activeCompany?.nit && (

@@ -111,7 +111,10 @@ def confirm_deadline(db: Session, deadline_id: int):
     if not deadline.proof_storage_key:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Debe adjuntar un comprobante antes de marcar el vencimiento como cumplido",
+            detail=(
+                "Debe adjuntar un comprobante antes de marcar el "
+                "vencimiento como cumplido"
+            ),
         )
 
     deadline.status = models.DeadlineStatus.CUMPLIDO

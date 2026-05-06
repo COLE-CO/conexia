@@ -73,7 +73,7 @@ export default function DeadlineCard({
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-medium">
               {deadline.obligation_type
-                ? OBLIGATION_LABELS[deadline.obligation_type] ?? deadline.name
+                ? (OBLIGATION_LABELS[deadline.obligation_type] ?? deadline.name)
                 : deadline.name}
             </span>
             {deadline.source === 'calendar_dian_2026' && (
