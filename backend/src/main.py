@@ -1,4 +1,5 @@
 import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -13,7 +14,9 @@ from src.scheduler import start_scheduler, stop_scheduler
 app = FastAPI(title="Conexia API")
 
 # CORS configuration from environment variables
-cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",")
+cors_origins = os.getenv(
+    "CORS_ORIGINS", "http://localhost:3000,http://localhost:5173"
+).split(",")
 origins = [origin.strip() for origin in cors_origins]
 
 app.add_middleware(
