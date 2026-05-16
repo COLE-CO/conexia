@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from src.core.database import get_db
 from src.modules.auth import dependencies as auth_dependencies
 from src.modules.auth import models as auth_models
+from src.modules.family_office.deadlines.calendar_service import (
+    generate_dian_deadlines_for_company,
+)
 
 from . import schemas, service
 
@@ -70,6 +73,27 @@ def delete_company(
         raise HTTPException(status_code=404, detail="Company not found")
 
     return {"message": "Company deleted successfully"}
+
+
+@router.post(
+    "/{company_id}/regenerate-dian-calendar",
+    status_code=status.HTTP_200_OK,
+)
+def regenerate_dian_calendar(
+    company_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(auth_dependencies.require_role([auth_models.UserRole.ADMIN])),
+):
+    company = service.get_company(db, company_id)
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    if not company.nit:
+        raise HTTPException(
+            status_code=400,
+            detail="La empresa no tiene NIT configurado",
+        )
+    created = generate_dian_deadlines_for_company(db, company)
+    return {"created": created}
 
 
 @router.get("/{company_id}", response_model=schemas.CompanyResponse)

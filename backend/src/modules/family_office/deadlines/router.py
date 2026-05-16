@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
 from src.core.database import get_db
@@ -96,6 +96,57 @@ def delete_deadline(
             detail="Vencimiento no encontrado",
         )
     return {"message": "Vencimiento eliminado correctamente"}
+
+
+@router.post(
+    "/{deadline_id}/proof",
+    response_model=schemas.DeadlineResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def upload_deadline_proof(
+    deadline_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user=Depends(auth_dependencies.require_role(ALLOWED_ROLES)),
+):
+    deadline = service.attach_proof(db, deadline_id, file)
+    if not deadline:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Vencimiento no encontrado",
+        )
+    return deadline
+
+
+@router.get("/{deadline_id}/proof", response_model=schemas.DeadlineProofDownload)
+def download_deadline_proof(
+    deadline_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(auth_dependencies.require_role(ALLOWED_ROLES)),
+):
+    result = service.get_proof_download_url(db, deadline_id)
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Vencimiento no encontrado",
+        )
+    url, filename = result
+    return schemas.DeadlineProofDownload(url=url, filename=filename)
+
+
+@router.delete("/{deadline_id}/proof", response_model=schemas.DeadlineResponse)
+def delete_deadline_proof(
+    deadline_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(auth_dependencies.require_role(ALLOWED_ROLES)),
+):
+    deadline = service.remove_proof(db, deadline_id)
+    if not deadline:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Vencimiento no encontrado",
+        )
+    return deadline
 
 
 @router.post("/{deadline_id}/send-reminder", response_model=schemas.DeadlineResponse)

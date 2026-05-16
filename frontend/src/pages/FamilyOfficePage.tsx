@@ -13,8 +13,14 @@ import {
   getDeadlinesByCompany,
   confirmDeadline,
   deleteDeadline,
+  uploadDeadlineProof,
+  getDeadlineProofUrl,
+  deleteDeadlineProof,
+  regenerateDianCalendar,
+  OBLIGATION_LABELS,
 } from '../services/deadlineService';
-import type { Deadline } from '../services/deadlineService';
+import { toast } from 'sonner';
+import type { Deadline, ObligationType } from '../services/deadlineService';
 import UploadBalanceModal from '../components/UploadBalanceModal';
 import DeadlineCard from '../components/DeadlineCard';
 import DeadlineModal from '../components/DeadlineModal';
@@ -97,6 +103,45 @@ export default function FamilyOfficePage() {
   const [confirmDeleteDeadline, setConfirmDeleteDeadline] = useState<
     number | null
   >(null);
+  const [obligationFilter, setObligationFilter] = useState<
+    ObligationType | 'all'
+  >('all');
+  const [regeneratingDian, setRegeneratingDian] = useState(false);
+
+  const availableObligationTypes = Array.from(
+    new Set(
+      deadlines
+        .map((d) => d.obligation_type)
+        .filter((t): t is ObligationType => Boolean(t))
+    )
+  );
+
+  const filteredDeadlines =
+    obligationFilter === 'all'
+      ? deadlines
+      : deadlines.filter((d) => d.obligation_type === obligationFilter);
+
+  const handleRegenerateDian = async () => {
+    if (!activeCompany) return;
+    setRegeneratingDian(true);
+    try {
+      const { created } = await regenerateDianCalendar(activeCompany.id);
+      const data = await getDeadlinesByCompany(activeCompany.id);
+      setDeadlines(sortDeadlines(data));
+      toast.success(
+        created > 0
+          ? `Calendario DIAN regenerado: ${created} obligaciones nuevas`
+          : 'El calendario DIAN ya estaba al día'
+      );
+    } catch (err) {
+      const detail =
+        (err as { response?: { data?: { detail?: string } } })?.response?.data
+          ?.detail ?? 'No se pudo regenerar el calendario DIAN';
+      toast.error(detail);
+    } finally {
+      setRegeneratingDian(false);
+    }
+  };
 
   const loadingBalances =
     !!activeCompany && loadedCompanyId !== activeCompany.id;
@@ -206,11 +251,19 @@ export default function FamilyOfficePage() {
   };
 
   const handleConfirmDeadline = async (id: number) => {
-    await confirmDeadline(id);
-    if (activeCompany) {
-      getDeadlinesByCompany(activeCompany.id)
-        .then((data) => setDeadlines(sortDeadlines(data)))
-        .catch(() => setDeadlines([]));
+    try {
+      await confirmDeadline(id);
+      if (activeCompany) {
+        getDeadlinesByCompany(activeCompany.id)
+          .then((data) => setDeadlines(sortDeadlines(data)))
+          .catch(() => setDeadlines([]));
+      }
+      toast.success('Vencimiento marcado como cumplido');
+    } catch (err) {
+      const detail =
+        (err as { response?: { data?: { detail?: string } } })?.response?.data
+          ?.detail ?? 'No se pudo confirmar el vencimiento';
+      toast.error(detail);
     }
   };
 
@@ -218,6 +271,45 @@ export default function FamilyOfficePage() {
     await deleteDeadline(id);
     setDeadlines((prev) => sortDeadlines(prev.filter((d) => d.id !== id)));
     setConfirmDeleteDeadline(null);
+  };
+
+  const handleUploadDeadlineProof = async (id: number, file: File) => {
+    try {
+      const updated = await uploadDeadlineProof(id, file);
+      setDeadlines((prev) =>
+        sortDeadlines(prev.map((d) => (d.id === id ? updated : d)))
+      );
+      toast.success('Comprobante subido correctamente');
+    } catch (err) {
+      const detail =
+        (err as { response?: { data?: { detail?: string } } })?.response?.data
+          ?.detail ?? 'No se pudo subir el comprobante';
+      toast.error(detail);
+    }
+  };
+
+  const handleDownloadDeadlineProof = async (id: number) => {
+    try {
+      const { url } = await getDeadlineProofUrl(id);
+      window.open(url, '_blank');
+    } catch {
+      toast.error('No se pudo descargar el comprobante');
+    }
+  };
+
+  const handleRemoveDeadlineProof = async (id: number) => {
+    try {
+      const updated = await deleteDeadlineProof(id);
+      setDeadlines((prev) =>
+        sortDeadlines(prev.map((d) => (d.id === id ? updated : d)))
+      );
+      toast.success('Comprobante eliminado');
+    } catch (err) {
+      const detail =
+        (err as { response?: { data?: { detail?: string } } })?.response?.data
+          ?.detail ?? 'No se pudo eliminar el comprobante';
+      toast.error(detail);
+    }
   };
 
   const handleDeadlineSuccess = (deadline: Deadline) => {
@@ -272,7 +364,24 @@ export default function FamilyOfficePage() {
               Subir balance
             </button>
           </div>
-          <div className={activeTab === 'vencimientos' ? 'block' : 'hidden'}>
+          <div
+            className={
+              activeTab === 'vencimientos'
+                ? 'flex items-center gap-2'
+                : 'hidden'
+            }
+          >
+            {activeCompany?.nit && (
+              <button
+                onClick={handleRegenerateDian}
+                disabled={regeneratingDian}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-neutral-border bg-neutral-surface text-neutral-text text-sm hover:bg-neutral-bg transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Regenera las obligaciones DIAN faltantes según el NIT"
+              >
+                <CalendarClock size={16} />
+                {regeneratingDian ? 'Regenerando…' : 'Regenerar DIAN'}
+              </button>
+            )}
             <button
               onClick={() => {
                 setEditingDeadline(null);
@@ -488,10 +597,37 @@ export default function FamilyOfficePage() {
           </div>
         ) : (
           <div className="bg-neutral-surface border border-neutral-border rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-neutral-border">
+            <div className="px-6 py-4 border-b border-neutral-border flex items-center justify-between gap-4 flex-wrap">
               <h2 className="text-sm font-bold text-neutral-text">
                 Obligaciones fiscales y vencimientos
               </h2>
+              {availableObligationTypes.length > 0 && (
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <button
+                    onClick={() => setObligationFilter('all')}
+                    className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                      obligationFilter === 'all'
+                        ? 'bg-primary text-white border-primary'
+                        : 'bg-neutral-surface text-neutral-muted border-neutral-border hover:bg-neutral-bg'
+                    }`}
+                  >
+                    Todas
+                  </button>
+                  {availableObligationTypes.map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setObligationFilter(t)}
+                      className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                        obligationFilter === t
+                          ? 'bg-primary text-white border-primary'
+                          : 'bg-neutral-surface text-neutral-muted border-neutral-border hover:bg-neutral-bg'
+                      }`}
+                    >
+                      {OBLIGATION_LABELS[t]}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <table className="w-full">
               <thead>
@@ -512,7 +648,7 @@ export default function FamilyOfficePage() {
                 </tr>
               </thead>
               <tbody>
-                {deadlines.map((deadline) => (
+                {filteredDeadlines.map((deadline) => (
                   <DeadlineCard
                     key={deadline.id}
                     deadline={deadline}
@@ -523,6 +659,9 @@ export default function FamilyOfficePage() {
                       setShowDeadlineModal(true);
                     }}
                     onDelete={(id) => setConfirmDeleteDeadline(id)}
+                    onUploadProof={handleUploadDeadlineProof}
+                    onDownloadProof={handleDownloadDeadlineProof}
+                    onRemoveProof={handleRemoveDeadlineProof}
                   />
                 ))}
               </tbody>

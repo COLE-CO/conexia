@@ -98,14 +98,53 @@ def generate_ai_report(db: Session, balance_id: int) -> schemas.ReportData:
 
     items = [schemas.LineItem(**item) for item in ai_result.get("items", [])]
 
+    snapshot_raw = ai_result.get("snapshot") or {}
+    snapshot = schemas.FinancialSnapshot(**snapshot_raw) if snapshot_raw else None
+
+    total_income = ai_result.get("total_income", 0) or 0
+    total_expenses = ai_result.get("total_expenses", 0) or 0
+    net_result = ai_result.get("net_result", 0) or 0
+
     return schemas.ReportData(
         company_name=company_name,
         period=period,
         items=items,
-        total_income=ai_result.get("total_income", 0),
-        total_expenses=ai_result.get("total_expenses", 0),
-        net_result=ai_result.get("net_result", 0),
+        total_income=total_income,
+        total_expenses=total_expenses,
+        net_result=net_result,
         ai_summary=ai_result.get("ai_summary", ""),
+        snapshot=snapshot,
+        ratios=_compute_ratios(snapshot, total_income, net_result),
+        findings=ai_result.get("findings") or [],
+        recommendations=ai_result.get("recommendations") or [],
+    )
+
+
+def _safe_div(num: float | None, den: float | None) -> float | None:
+    if num is None or den in (None, 0):
+        return None
+    return num / den
+
+
+def _compute_ratios(
+    snapshot: schemas.FinancialSnapshot | None,
+    total_income: float,
+    net_result: float,
+) -> schemas.FinancialRatios | None:
+    if snapshot is None:
+        return None
+    working_capital = (
+        snapshot.current_assets - snapshot.current_liabilities
+        if snapshot.current_assets is not None
+        and snapshot.current_liabilities is not None
+        else None
+    )
+    return schemas.FinancialRatios(
+        current_ratio=_safe_div(snapshot.current_assets, snapshot.current_liabilities),
+        debt_ratio=_safe_div(snapshot.total_liabilities, snapshot.total_assets),
+        equity_ratio=_safe_div(snapshot.equity, snapshot.total_assets),
+        net_margin=_safe_div(net_result, total_income) if total_income else None,
+        working_capital=working_capital,
     )
 
 
@@ -124,6 +163,11 @@ def save_report(db: Session, data: schemas.SaveReportRequest) -> SavedReport:
         total_expenses=data.total_expenses,
         net_result=data.net_result,
         ai_summary=data.ai_summary,
+        snapshot=data.snapshot,
+        ratios=data.ratios
+        or _compute_ratios(data.snapshot, data.total_income, data.net_result),
+        findings=data.findings,
+        recommendations=data.recommendations,
     )
     pdf_buffer = generate_report_pdf(pdf_request)
 
