@@ -60,7 +60,10 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const roleLabel = user?.role?.replaceAll('_', ' ');
   const hasNotificationsAccess =
-    !!user?.role && NOTIFICATIONS_ALLOWED_ROLES.includes(user.role);
+    !!user?.role &&
+    NOTIFICATIONS_ALLOWED_ROLES.includes(
+      user.role as 'admin' | 'contador_family_office'
+    );
   const hasEnabledAlerts =
     !!user?.alert_deadlines_enabled ||
     !!user?.alert_balances_enabled ||

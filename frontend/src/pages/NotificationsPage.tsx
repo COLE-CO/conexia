@@ -69,7 +69,10 @@ export default function NotificationsPage() {
   const [companiesReloadKey, setCompaniesReloadKey] = useState(0);
 
   const hasNotificationsAccess =
-    !!user?.role && NOTIFICATIONS_ALLOWED_ROLES.includes(user.role);
+    !!user?.role &&
+    NOTIFICATIONS_ALLOWED_ROLES.includes(
+      user.role as 'admin' | 'contador_family_office'
+    );
   const hasEnabledAlerts =
     hasNotificationsAccess &&
     (!!user?.alert_deadlines_enabled ||

@@ -1,8 +1,7 @@
-import os
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.core.config import settings
 from src.modules.auth.router import router as auth_router
 from src.modules.cole_co.cash_flow.router import router as cash_flow_router
 from src.modules.family_office.balances.router import router as balances_router
@@ -13,11 +12,7 @@ from src.scheduler import start_scheduler, stop_scheduler
 
 app = FastAPI(title="Conexia API")
 
-# CORS configuration from environment variables
-cors_origins = os.getenv(
-    "CORS_ORIGINS", "http://localhost:3000,http://localhost:5173"
-).split(",")
-origins = [origin.strip() for origin in cors_origins]
+origins = [origin.strip() for origin in settings.CORS_ORIGINS.split(",")]
 
 app.add_middleware(
     CORSMiddleware,

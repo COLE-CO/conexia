@@ -4,7 +4,7 @@ export interface UserProfile {
   id: number;
   email: string;
   full_name: string | null;
-  role: string;
+  role: 'admin' | 'contador_family_office' | 'contador_cole_co';
   is_active: boolean;
   must_change_password: boolean;
   alert_deadlines_enabled: boolean;
