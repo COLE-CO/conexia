@@ -70,7 +70,7 @@ export const getDeadlinesByCompany = async (
 export const createDeadline = async (
   data: CreateDeadline
 ): Promise<Deadline> => {
-  const response = await api.post('/deadlines/', data);
+  const response = await api.post('/deadlines', data);
   return response.data;
 };
 
