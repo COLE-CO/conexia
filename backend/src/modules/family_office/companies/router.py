@@ -13,7 +13,7 @@ from . import schemas, service
 router = APIRouter(prefix="/companies", tags=["Companies"])
 
 
-@router.post("/", response_model=schemas.CompanyResponse)
+@router.post("", response_model=schemas.CompanyResponse)
 def create_company(
     company: schemas.CompanyCreate,
     db: Session = Depends(get_db),
@@ -26,7 +26,7 @@ def create_company(
     return service.create_company(db, company)
 
 
-@router.get("/", response_model=list[schemas.CompanyResponse])
+@router.get("", response_model=list[schemas.CompanyResponse])
 def get_companies(
     db: Session = Depends(get_db),
     current_user=Depends(
