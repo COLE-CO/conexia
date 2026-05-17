@@ -33,5 +33,8 @@ class Settings(BaseSettings):
     # Email
     RESEND_API_KEY: str
 
+    # CORS
+    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
+
 
 settings = Settings()
