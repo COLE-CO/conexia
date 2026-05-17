@@ -16,7 +16,7 @@ ALLOWED_ROLES = [
 
 
 @router.post(
-    "/",
+    "",
     response_model=schemas.DeadlineResponse,
     status_code=status.HTTP_201_CREATED,
 )
