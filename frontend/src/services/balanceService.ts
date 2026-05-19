@@ -3,10 +3,11 @@ import api from './api';
 export interface Balance {
   id: number;
   company_id: number;
+  original_filename: string;
+  storage_key: string;
+  file_type: string;
   year: number;
   month?: number;
-  file_name: string;
-  file_url: string;
   uploaded_at: string;
 }
 

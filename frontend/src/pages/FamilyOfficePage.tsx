@@ -184,12 +184,17 @@ export default function FamilyOfficePage() {
   // Cargar balances
   useEffect(() => {
     if (!activeCompany) return;
+
     const currentCompanyId = activeCompany.id;
     let cancelled = false;
 
     getBalancesByCompany(currentCompanyId)
       .then((data) => {
-        if (!cancelled) setBalances(data);
+        console.log('BALANCES:', data);
+
+        if (!cancelled) {
+          setBalances(data);
+        }
       })
       .catch(() => {
         if (!cancelled) setBalances([]);
@@ -514,7 +519,7 @@ export default function FamilyOfficePage() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-neutral-text">
-                        {balance.file_name}
+                        {balance.original_filename}
                       </p>
                       <p className="text-xs text-neutral-muted">
                         {activeCompany?.name} · {balance.year}
@@ -527,7 +532,7 @@ export default function FamilyOfficePage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() =>
-                      handleViewBalance(balance.id, balance.file_name)
+                      handleViewBalance(balance.id, balance.original_filename)
                     }
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-border text-sm text-neutral-text hover:bg-neutral-bg transition-colors duration-200"
                   >
@@ -596,7 +601,7 @@ export default function FamilyOfficePage() {
             </div>
           </div>
         ) : (
-          <div className="bg-neutral-surface border border-neutral-border rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-neutral-surface border border-neutral-border rounded-2xl shadow-sm">
             <div className="px-6 py-4 border-b border-neutral-border flex items-center justify-between gap-4 flex-wrap">
               <h2 className="text-sm font-bold text-neutral-text">
                 Obligaciones fiscales y vencimientos

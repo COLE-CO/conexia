@@ -235,7 +235,7 @@ export default function ReportModal({
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-neutral-text truncate">
-                      {balance.file_name}
+                      {balance.original_filename}
                     </p>
                     <p className="text-xs text-neutral-muted">
                       {balance.year}

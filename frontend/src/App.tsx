@@ -74,16 +74,6 @@ function App() {
           }
         />
         <Route
-          path="/facturas"
-          element={
-            <ProtectedRoute>
-              <LayoutWithSidebar>
-                <h1 className="p-6">Facturas</h1>
-              </LayoutWithSidebar>
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/reportes"
           element={
             <ProtectedRoute>

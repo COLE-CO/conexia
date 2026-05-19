@@ -10,7 +10,6 @@ interface NewMovementCardProps {
   movementForm: MovementFormState;
   onChange: (next: MovementFormState) => void;
   accounts: CashAccount[];
-  movementError: string | null;
   movementSaving: boolean;
   canSaveMovement: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>;
@@ -20,7 +19,6 @@ export default function NewMovementCard({
   movementForm,
   onChange,
   accounts,
-  movementError,
   movementSaving,
   canSaveMovement,
   onSubmit,
@@ -122,12 +120,6 @@ export default function NewMovementCard({
             </select>
           </div>
         </div>
-
-        {movementError && (
-          <p className="text-xs text-danger bg-danger/10 border border-danger/20 rounded-md px-2 py-1">
-            {movementError}
-          </p>
-        )}
 
         <button
           disabled={!canSaveMovement || movementSaving}

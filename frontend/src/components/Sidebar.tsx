@@ -11,7 +11,6 @@ import {
   LayoutDashboard,
   Briefcase,
   ArrowLeftRight,
-  FileText,
   BarChart2,
   Settings,
   LogOut,
@@ -38,12 +37,6 @@ const mainItems = [
     icon: ArrowLeftRight,
     path: '/flujo-de-caja',
     roles: [...CASH_FLOW_ALLOWED_ROLES],
-  },
-  {
-    label: 'Facturas',
-    icon: FileText,
-    path: '/facturas',
-    roles: ['admin', 'contador_cole_co'],
   },
   {
     label: 'Reportes',
