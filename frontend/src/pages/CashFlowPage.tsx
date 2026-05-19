@@ -24,7 +24,6 @@ export default function CashFlowPage() {
     setMovementForm,
     accountForm,
     setAccountForm,
-    movementError,
     accountError,
     movementSaving,
     accountSaving,
@@ -110,7 +109,6 @@ export default function CashFlowPage() {
                 movementForm={movementForm}
                 onChange={setMovementForm}
                 accounts={accounts}
-                movementError={movementError}
                 movementSaving={movementSaving}
                 canSaveMovement={!!canSaveMovement}
                 onSubmit={handleCreateMovement}
