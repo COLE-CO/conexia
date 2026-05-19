@@ -22,7 +22,6 @@ export default function CompanySelector() {
     if (isOpen) {
       setTimeout(() => searchRef.current?.focus(), 50);
     } else {
-       
       setSearch('');
     }
   }, [isOpen]);
