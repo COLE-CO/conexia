@@ -596,7 +596,7 @@ export default function FamilyOfficePage() {
             </div>
           </div>
         ) : (
-          <div className="bg-neutral-surface border border-neutral-border rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-neutral-surface border border-neutral-border rounded-2xl shadow-sm">
             <div className="px-6 py-4 border-b border-neutral-border flex items-center justify-between gap-4 flex-wrap">
               <h2 className="text-sm font-bold text-neutral-text">
                 Obligaciones fiscales y vencimientos

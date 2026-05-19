@@ -40,12 +40,6 @@ const mainItems = [
     roles: [...CASH_FLOW_ALLOWED_ROLES],
   },
   {
-    label: 'Facturas',
-    icon: FileText,
-    path: '/facturas',
-    roles: ['admin', 'contador_cole_co'],
-  },
-  {
     label: 'Reportes',
     icon: BarChart2,
     path: '/reportes',
