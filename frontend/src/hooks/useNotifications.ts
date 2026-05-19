@@ -255,7 +255,7 @@ export const useNotifications = ({
     const balanceNotifications = balanceSources.map(
       ({ companyId, companyName, balance }) => ({
         id: `balance-${companyId}-${balance.id}`,
-        title: `Balance cargado: ${balance.file_name}`,
+        title: `Balance cargado: ${balance.original_filename}`,
         message: `${
           companyName ? `Empresa: ${companyName}. ` : ''
         }Se registró un balance para ${

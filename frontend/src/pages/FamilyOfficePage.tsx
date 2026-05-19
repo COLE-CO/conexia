@@ -182,31 +182,31 @@ export default function FamilyOfficePage() {
   }, [hasNewObligationAction, searchParams, setSearchParams]);
 
   // Cargar balances
-useEffect(() => {
-  if (!activeCompany) return;
+  useEffect(() => {
+    if (!activeCompany) return;
 
-  const currentCompanyId = activeCompany.id;
-  let cancelled = false;
+    const currentCompanyId = activeCompany.id;
+    let cancelled = false;
 
-  getBalancesByCompany(currentCompanyId)
-    .then((data) => {
-      console.log('BALANCES:', data);
+    getBalancesByCompany(currentCompanyId)
+      .then((data) => {
+        console.log('BALANCES:', data);
 
-      if (!cancelled) {
-        setBalances(data);
-      }
-    })
-    .catch(() => {
-      if (!cancelled) setBalances([]);
-    })
-    .finally(() => {
-      if (!cancelled) setLoadedCompanyId(currentCompanyId);
-    });
+        if (!cancelled) {
+          setBalances(data);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setBalances([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadedCompanyId(currentCompanyId);
+      });
 
-  return () => {
-    cancelled = true;
-  };
-}, [activeCompany]);
+    return () => {
+      cancelled = true;
+    };
+  }, [activeCompany]);
 
   // Cargar vencimientos
   useEffect(() => {
@@ -447,9 +447,10 @@ useEffect(() => {
               setSearchParams(next, { replace: true });
             }}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium capitalize transition-all duration-200
-              ${activeTab === tab
-                ? 'bg-neutral-bg text-neutral-text border border-neutral-border shadow-sm'
-                : 'text-neutral-muted hover:text-neutral-text hover:bg-neutral-bg/60'
+              ${
+                activeTab === tab
+                  ? 'bg-neutral-bg text-neutral-text border border-neutral-border shadow-sm'
+                  : 'text-neutral-muted hover:text-neutral-text hover:bg-neutral-bg/60'
               }
             `}
           >
@@ -609,10 +610,11 @@ useEffect(() => {
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <button
                     onClick={() => setObligationFilter('all')}
-                    className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${obligationFilter === 'all'
+                    className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                      obligationFilter === 'all'
                         ? 'bg-primary text-white border-primary'
                         : 'bg-neutral-surface text-neutral-muted border-neutral-border hover:bg-neutral-bg'
-                      }`}
+                    }`}
                   >
                     Todas
                   </button>
@@ -620,10 +622,11 @@ useEffect(() => {
                     <button
                       key={t}
                       onClick={() => setObligationFilter(t)}
-                      className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${obligationFilter === t
+                      className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                        obligationFilter === t
                           ? 'bg-primary text-white border-primary'
                           : 'bg-neutral-surface text-neutral-muted border-neutral-border hover:bg-neutral-bg'
-                        }`}
+                      }`}
                     >
                       {OBLIGATION_LABELS[t]}
                     </button>

@@ -85,12 +85,13 @@ describe('FamilyOfficePage', () => {
     getBalancesByCompanyMock.mockResolvedValue([
       {
         id: 10,
-        company_id: 1,
+        company_id: 4,
+        original_filename: 'balance-marzo.xlsx',
+        storage_key: 'balances/4/2026/test.xlsx',
+        file_type: '.xlsx',
         year: 2026,
-        month: 3,
-        file_name: 'balance-marzo.xlsx',
-        file_url: '/balances/10',
-        uploaded_at: '2026-03-20T10:00:00.000Z',
+        month: 5,
+        uploaded_at: '2026-05-19',
       },
     ]);
     getDeadlinesByCompanyMock.mockResolvedValue([]);

@@ -126,7 +126,9 @@ export default function ChartsRow({
                       {page + 1} / {totalPages}
                     </span>
                     <button
-                      onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                      onClick={() =>
+                        setPage((p) => Math.min(totalPages - 1, p + 1))
+                      }
                       disabled={page === totalPages - 1}
                       className="p-1 rounded-lg border border-neutral-border text-neutral-muted hover:bg-neutral-bg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                     >
@@ -170,9 +172,17 @@ export default function ChartsRow({
                     iconSize={8}
                     wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
                   />
-                  <Bar dataKey="Pendiente" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                  <Bar
+                    dataKey="Pendiente"
+                    fill="#3B82F6"
+                    radius={[4, 4, 0, 0]}
+                  />
                   <Bar dataKey="Vencido" fill="#EF4444" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="Cumplido" fill="#22C55E" radius={[4, 4, 0, 0]} />
+                  <Bar
+                    dataKey="Cumplido"
+                    fill="#22C55E"
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             )}

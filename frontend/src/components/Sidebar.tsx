@@ -11,7 +11,6 @@ import {
   LayoutDashboard,
   Briefcase,
   ArrowLeftRight,
-  FileText,
   BarChart2,
   Settings,
   LogOut,
