@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Bar,
   BarChart,
@@ -10,11 +11,13 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import type { DashboardMetrics } from '../types';
 import ChartSkeleton from './ChartSkeleton';
 
 const DONUT_COLORS = ['#3B82F6', '#EF4444', '#22C55E'];
+const PAGE_SIZE = 4;
 
 interface ChartsRowProps {
   loading: boolean;
@@ -27,6 +30,14 @@ export default function ChartsRow({
   dashboard,
   deadlinesCount,
 }: ChartsRowProps) {
+  const [page, setPage] = useState(0);
+
+  const totalPages = Math.ceil(dashboard.barData.length / PAGE_SIZE);
+  const paginatedData = dashboard.barData.slice(
+    page * PAGE_SIZE,
+    page * PAGE_SIZE + PAGE_SIZE
+  );
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
       {loading ? (
@@ -36,6 +47,7 @@ export default function ChartsRow({
         </>
       ) : (
         <>
+          {/* Donut chart — unchanged */}
           <div className="bg-neutral-surface border border-neutral-border rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-sm font-bold text-neutral-text">
@@ -91,14 +103,38 @@ export default function ChartsRow({
             )}
           </div>
 
+          {/* Bar chart — with pagination */}
           <div className="bg-neutral-surface border border-neutral-border rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-sm font-bold text-neutral-text">
                 Obligaciones por empresa
               </h2>
-              <span className="text-xs text-neutral-muted">
-                {dashboard.barData.length} empresas
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-neutral-muted">
+                  {dashboard.barData.length} empresas
+                </span>
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setPage((p) => Math.max(0, p - 1))}
+                      disabled={page === 0}
+                      className="p-1 rounded-lg border border-neutral-border text-neutral-muted hover:bg-neutral-bg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      <ChevronLeft size={14} />
+                    </button>
+                    <span className="text-xs text-neutral-muted w-10 text-center">
+                      {page + 1} / {totalPages}
+                    </span>
+                    <button
+                      onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                      disabled={page === totalPages - 1}
+                      className="p-1 rounded-lg border border-neutral-border text-neutral-muted hover:bg-neutral-bg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      <ChevronRight size={14} />
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
             {dashboard.barData.length === 0 ? (
               <div className="flex items-center justify-center h-52 text-sm text-neutral-muted">
@@ -106,7 +142,7 @@ export default function ChartsRow({
               </div>
             ) : (
               <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={dashboard.barData} barSize={8} barGap={3}>
+                <BarChart data={paginatedData} barSize={8} barGap={3}>
                   <XAxis
                     dataKey="name"
                     tick={{ fontSize: 11 }}
@@ -134,17 +170,9 @@ export default function ChartsRow({
                     iconSize={8}
                     wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
                   />
-                  <Bar
-                    dataKey="Pendiente"
-                    fill="#3B82F6"
-                    radius={[4, 4, 0, 0]}
-                  />
+                  <Bar dataKey="Pendiente" fill="#3B82F6" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="Vencido" fill="#EF4444" radius={[4, 4, 0, 0]} />
-                  <Bar
-                    dataKey="Cumplido"
-                    fill="#22C55E"
-                    radius={[4, 4, 0, 0]}
-                  />
+                  <Bar dataKey="Cumplido" fill="#22C55E" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
