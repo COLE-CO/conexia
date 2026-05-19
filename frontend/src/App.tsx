@@ -12,6 +12,7 @@ import React from 'react';
 import SettingsPage from './pages/SettingsPage';
 import NotificationsPage from './pages/NotificationsPage';
 import CashFlowPage from './pages/CashFlowPage';
+import PaymentsPage from './pages/PaymentsPage';
 import { CASH_FLOW_ALLOWED_ROLES } from './constants/authorization';
 
 function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
@@ -69,6 +70,16 @@ function App() {
             <ProtectedRoute allowedRoles={CASH_FLOW_ALLOWED_ROLES}>
               <LayoutWithSidebar>
                 <CashFlowPage />
+              </LayoutWithSidebar>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/pagos"
+          element={
+            <ProtectedRoute>
+              <LayoutWithSidebar>
+                <PaymentsPage />
               </LayoutWithSidebar>
             </ProtectedRoute>
           }
