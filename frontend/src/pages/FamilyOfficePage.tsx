@@ -19,6 +19,8 @@ import {
   regenerateDianCalendar,
   OBLIGATION_LABELS,
 } from '../services/deadlineService';
+import { getSavedReportsByCompany } from '../services/reportService';
+import type { SavedReport } from '../services/reportService';
 import { toast } from 'sonner';
 import type { Deadline, ObligationType } from '../services/deadlineService';
 import UploadBalanceModal from '../components/UploadBalanceModal';
@@ -66,7 +68,18 @@ const metrics = [
     icon: Users,
     color: 'bg-primary/10 text-primary',
   },
-];
+] as const;
+
+const currencyFormatter = new Intl.NumberFormat('es-CO', {
+  style: 'currency',
+  currency: 'COP',
+  maximumFractionDigits: 0,
+});
+
+const formatCurrency = (value: number | null | undefined) =>
+  value === null || value === undefined
+    ? '—'
+    : currencyFormatter.format(value);
 
 type Tab = 'balances' | 'vencimientos' | 'cartera';
 
@@ -94,6 +107,7 @@ export default function FamilyOfficePage() {
   // Reportes IA
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportBalanceId, setReportBalanceId] = useState<number | null>(null);
+  const [latestReport, setLatestReport] = useState<SavedReport | null>(null);
 
   // Vencimientos
   const [deadlines, setDeadlines] = useState<Deadline[]>([]);
@@ -207,6 +221,40 @@ export default function FamilyOfficePage() {
       cancelled = true;
     };
   }, [activeCompany]);
+
+  // Cargar último reporte IA para alimentar las métricas
+  useEffect(() => {
+    if (!activeCompany) {
+      setLatestReport(null);
+      return;
+    }
+    let cancelled = false;
+    getSavedReportsByCompany(activeCompany.id)
+      .then((reports) => {
+        if (cancelled) return;
+        const latest = reports.length
+          ? [...reports].sort(
+              (a, b) =>
+                new Date(b.created_at).getTime() -
+                new Date(a.created_at).getTime()
+            )[0]
+          : null;
+        setLatestReport(latest);
+      })
+      .catch(() => {
+        if (!cancelled) setLatestReport(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeCompany]);
+
+  const metricsValues = [
+    formatCurrency(latestReport?.total_income),
+    formatCurrency(latestReport?.total_expenses),
+    formatCurrency(latestReport?.net_result),
+    '—',
+  ];
 
   // Cargar vencimientos
   useEffect(() => {
@@ -417,7 +465,7 @@ export default function FamilyOfficePage() {
 
       {/* Métricas */}
       <div className="relative z-10 grid grid-cols-4 gap-4 mb-6">
-        {metrics.map(({ label, value, icon: Icon, color }) => (
+        {metrics.map(({ label, icon: Icon, color }, idx) => (
           <div
             key={label}
             className="bg-neutral-surface border border-neutral-border rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow duration-200"
@@ -428,7 +476,9 @@ export default function FamilyOfficePage() {
               <Icon size={20} />
             </div>
             <div>
-              <p className="text-lg font-bold text-neutral-text">{value}</p>
+              <p className="text-lg font-bold text-neutral-text">
+                {metricsValues[idx]}
+              </p>
               <p className="text-xs text-neutral-muted">{label}</p>
             </div>
           </div>
