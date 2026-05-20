@@ -77,9 +77,7 @@ const currencyFormatter = new Intl.NumberFormat('es-CO', {
 });
 
 const formatCurrency = (value: number | null | undefined) =>
-  value === null || value === undefined
-    ? '—'
-    : currencyFormatter.format(value);
+  value === null || value === undefined ? '—' : currencyFormatter.format(value);
 
 type Tab = 'balances' | 'vencimientos' | 'cartera';
 
